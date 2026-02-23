@@ -58,7 +58,7 @@
         .btn-login:hover { background-color: var(--gold-hover); box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3); }
 
         /* =========================================
-           TELA DO DASHBOARD (Oculta por padrão)
+           TELA DO DASHBOARD
            ========================================= */
         #telaDashboard { display: none; width: 100%; max-width: 1200px; padding: 20px; padding-bottom: 60px; }
 
@@ -212,7 +212,7 @@
             let filtroAtual = 'todos';
 
             // =========================================
-            // VERIFICAÇÃO DE SESSÃO (Mantém logado)
+            // VERIFICAÇÃO DE SESSÃO
             // =========================================
             async function checarSessao() {
                 const { data: { session } } = await supabaseClient.auth.getSession();
@@ -239,7 +239,6 @@
                 btnEntrar.innerText = "ENTRANDO...";
                 btnEntrar.disabled = true;
 
-                // Tenta fazer o login no Supabase
                 const { data, error } = await supabaseClient.auth.signInWithPassword({
                     email: email,
                     password: senha
@@ -256,7 +255,7 @@
 
             btnSair.addEventListener('click', async () => {
                 await supabaseClient.auth.signOut();
-                window.location.reload(); // Recarrega a página para voltar pro login
+                window.location.reload(); 
             });
 
             function mostrarErro(mensagem) {
@@ -268,11 +267,11 @@
                 telaLogin.style.display = 'none';
                 telaDashboard.style.display = 'block';
                 document.title = "Dashboard - Rifa PRO";
-                carregarDados(); // Só carrega os dados depois que o login for aprovado
+                carregarDados(); 
             }
 
             // =========================================
-            // LÓGICA DO DASHBOARD (Permanece igual)
+            // LÓGICA DO DASHBOARD
             // =========================================
             async function carregarDados() {
                 loader.style.display = 'block';
@@ -406,16 +405,21 @@
                 carregarDados();
             };
 
+            // =========================================
+            // CORREÇÃO DEFINITIVA DO LINK DO RECIBO
+            // =========================================
             window.gerarLinkRecibo = function(telefone) {
-                const telLimpo = telefone.replace(/\D/g, '');
-                const dominioUrl = window.location.origin + window.location.pathname.replace('admin.html', '');
-                const link = `${dominioUrl}recibo.html?telefone=${encodeURIComponent(telefone)}`;
+                // Pega a URL exata da pasta onde o painel está rodando (ignora o nome do arquivo atual)
+                const urlBase = window.location.href.substring(0, window.location.href.lastIndexOf('/')) + '/';
+                
+                // Monta o link final passando o telefone exatamente como está salvo no banco
+                const link = `${urlBase}recibo.html?telefone=${encodeURIComponent(telefone)}`;
+                
                 navigator.clipboard.writeText(link).then(() => {
-                    alert('✅ Link copiado com sucesso!');
+                    alert('✅ Link copiado com sucesso!\\n\\nVocê já pode colar para o cliente no WhatsApp.');
                 });
             };
 
-            // INICIA O CÓDIGO VERIFICANDO SE JÁ ESTÁ LOGADO
             checarSessao();
         });
     </script>
