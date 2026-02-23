@@ -3,32 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin - Rifa PRO</title>
+    <title>Admin Login - Rifa PRO</title>
     
     <link rel="icon" type="image/png" href="favicon.png">
-    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --bg-main: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-deep: #020617;
-            --gold: #fbbf24;
-            --green: #10b981;
-            --green-glow: rgba(16, 185, 129, 0.3);
-            --red: #ef4444;
-            --red-glow: rgba(239, 68, 68, 0.3);
-            --text-light: #f8fafc;
-            --text-muted: #94a3b8;
+            --bg-main: #0f172a; --bg-secondary: #1e293b; --bg-deep: #020617;
+            --gold: #fbbf24; --gold-hover: #f59e0b;
+            --green: #10b981; --green-glow: rgba(16, 185, 129, 0.3);
+            --red: #ef4444; --red-glow: rgba(239, 68, 68, 0.3);
+            --text-light: #f8fafc; --text-muted: #94a3b8;
             --border-light-thin: 1px solid rgba(255, 255, 255, 0.1);
             --sombra-card: 0 4px 15px rgba(0, 0, 0, 0.4);
             --borda-raio: 16px;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: radial-gradient(circle at top center, var(--bg-secondary), var(--bg-main)); color: var(--text-light); padding: 20px; padding-bottom: 60px; min-height: 100vh; }
+        body { background: radial-gradient(circle at top center, var(--bg-secondary), var(--bg-main)); color: var(--text-light); min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+
+        /* =========================================
+           TELA DE LOGIN
+           ========================================= */
+        #telaLogin {
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            width: 100%; min-height: 100vh; padding: 20px;
+        }
+        
+        .login-box {
+            background-color: var(--bg-secondary); width: 100%; max-width: 400px;
+            padding: 40px 30px; border-radius: var(--borda-raio);
+            border: var(--border-light-thin); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        .login-box h2 { color: var(--gold); margin-bottom: 5px; font-weight: 800; font-size: 1.8rem; }
+        .login-box p { color: var(--text-muted); margin-bottom: 25px; font-size: 0.95rem; }
+
+        .input-group { display: flex; flex-direction: column; text-align: left; margin-bottom: 20px; }
+        .input-group label { color: var(--text-muted); font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        .input-group input {
+            background-color: var(--bg-deep); border: 1px solid #334155; color: var(--text-light);
+            padding: 15px; border-radius: 10px; font-size: 1rem; outline: none; transition: 0.3s;
+        }
+        .input-group input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1); }
+
+        .btn-login {
+            background-color: var(--gold); color: var(--bg-deep); width: 100%; padding: 15px;
+            border: none; border-radius: 10px; font-weight: 800; font-size: 1rem; cursor: pointer;
+            transition: 0.2s; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .btn-login:hover { background-color: var(--gold-hover); box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3); }
+
+        /* =========================================
+           TELA DO DASHBOARD (Oculta por padrão)
+           ========================================= */
+        #telaDashboard { display: none; width: 100%; max-width: 1200px; padding: 20px; padding-bottom: 60px; }
 
         header {
             background-color: var(--bg-secondary); border: var(--border-light-thin); padding: 25px 30px;
@@ -37,36 +69,30 @@
         }
         .header-topo { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
         .header-topo h1 { font-size: 1.8rem; font-weight: 800; color: var(--gold); letter-spacing: 1px; }
-        .badge-admin { background-color: rgba(251, 191, 36, 0.1); color: var(--gold); border: 1px solid var(--gold); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; }
+        
+        .acoes-topo { display: flex; gap: 10px; align-items: center; }
+        .badge-admin { background-color: rgba(16, 185, 129, 0.1); color: var(--green); border: 1px solid var(--green); padding: 6px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; }
+        .btn-logout { background: none; border: 1px solid var(--text-muted); color: var(--text-muted); padding: 6px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-logout:hover { border-color: var(--red); color: var(--red); background-color: rgba(239, 68, 68, 0.1); }
 
         .metricas-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .metrica-card {
-            background-color: var(--bg-secondary); padding: 20px; border-radius: var(--borda-raio);
-            border: var(--border-light-thin); box-shadow: var(--sombra-card);
-            border-bottom: 4px solid var(--gold); display: flex; flex-direction: column;
-        }
+        .metrica-card { background-color: var(--bg-secondary); padding: 20px; border-radius: var(--borda-raio); border: var(--border-light-thin); box-shadow: var(--sombra-card); border-bottom: 4px solid var(--gold); display: flex; flex-direction: column; }
         .metrica-card.sucesso { border-bottom-color: var(--green); }
         .metrica-card.alerta { border-bottom-color: #f97316; }
-
         .metrica-titulo { font-size: 0.9rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 5px; }
         .metrica-valor { font-size: 2rem; font-weight: 900; color: var(--text-light); }
 
         .controles-container { background-color: var(--bg-secondary); border: var(--border-light-thin); padding: 20px; border-radius: var(--borda-raio); box-shadow: var(--sombra-card); margin-bottom: 25px; display: flex; flex-direction: column; gap: 15px; }
         .barra-pesquisa { width: 100%; padding: 14px; background-color: var(--bg-deep); border: 1px solid #334155; border-radius: 8px; font-size: 1rem; color: var(--text-light); outline: none; transition: border-color 0.2s; }
         .barra-pesquisa:focus { border-color: var(--gold); }
-        .barra-pesquisa::placeholder { color: #475569; }
 
         .filtros-botoes { display: flex; gap: 10px; flex-wrap: wrap; }
         .btn-filtro { padding: 8px 16px; border: 1px solid #334155; background: var(--bg-deep); border-radius: 20px; font-weight: 600; cursor: pointer; color: var(--text-muted); transition: all 0.2s; }
         .btn-filtro.ativo { background-color: rgba(251, 191, 36, 0.1); color: var(--gold); border-color: var(--gold); }
 
-        .container-reservas { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+        .container-reservas { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; width: 100%; }
         
-        .cartao-reserva {
-            background-color: var(--bg-secondary); padding: 20px; border-radius: var(--borda-raio);
-            border: var(--border-light-thin); box-shadow: var(--sombra-card);
-            border-top: 5px solid #f97316; display: flex; flex-direction: column; transition: transform 0.2s;
-        }
+        .cartao-reserva { background-color: var(--bg-secondary); padding: 20px; border-radius: var(--borda-raio); border: var(--border-light-thin); box-shadow: var(--sombra-card); border-top: 5px solid #f97316; display: flex; flex-direction: column; transition: transform 0.2s; }
         .cartao-reserva.pago { border-top-color: var(--green); }
         .cartao-reserva:hover { transform: translateY(-3px); }
 
@@ -86,14 +112,11 @@
         .numero-tag.pago { background-color: rgba(16, 185, 129, 0.1); color: var(--green); border-color: rgba(16, 185, 129, 0.3); }
 
         .botoes-acao { display: flex; flex-wrap: wrap; gap: 10px; margin-top: auto; }
-        button { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; color: white; transition: all 0.2s; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.5px;}
-        
+        .btn-acao { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; color: white; transition: all 0.2s; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.5px;}
         .btn-aprovar { background-color: var(--green); box-shadow: 0 4px 10px var(--green-glow); }
         .btn-aprovar:hover { background-color: #059669; }
-        
         .btn-cancelar { background-color: var(--bg-deep); border: 1px solid var(--red); color: var(--red); }
         .btn-cancelar:hover { background-color: var(--red); color: #fff; box-shadow: 0 4px 10px var(--red-glow); }
-        
         .btn-link { background-color: var(--gold); color: var(--bg-deep); width: 100%; margin-bottom: 8px; box-shadow: 0 4px 10px rgba(251, 191, 36, 0.2); }
         .btn-link:hover { background-color: var(--gold-hover); }
 
@@ -102,49 +125,83 @@
 </head>
 <body>
 
-    <header>
-        <div class="header-topo">
-            <h1>Painel Admin</h1>
-            <span class="badge-admin">🔒 Seguro</span>
-        </div>
-        <p style="color: var(--text-muted); font-size: 0.95rem;">Acompanhe suas vendas e aprove pagamentos em tempo real.</p>
-    </header>
-
-    <div class="metricas-container">
-        <div class="metrica-card">
-            <span class="metrica-titulo">Total Arrecadado</span>
-            <span class="metrica-valor" id="metricaReceita">R$ 0,00</span>
-        </div>
-        <div class="metrica-card sucesso">
-            <span class="metrica-titulo">Números Pagos</span>
-            <span class="metrica-valor" id="metricaPagos">0</span>
-        </div>
-        <div class="metrica-card alerta">
-            <span class="metrica-titulo">Aguardando PIX</span>
-            <span class="metrica-valor" id="metricaPendentes">0</span>
+    <div id="telaLogin">
+        <div class="login-box">
+            <h2>Área Restrita</h2>
+            <p>Faça login para gerenciar a rifa</p>
+            
+            <div class="input-group">
+                <label for="emailAdmin">E-mail</label>
+                <input type="email" id="emailAdmin" placeholder="admin@email.com" required>
+            </div>
+            
+            <div class="input-group">
+                <label for="senhaAdmin">Senha</label>
+                <input type="password" id="senhaAdmin" placeholder="••••••••" required>
+            </div>
+            
+            <button class="btn-login" id="btnEntrar">Acessar Painel</button>
+            <p id="msgErroLogin" style="color: var(--red); margin-top: 15px; font-size: 0.9rem; display: none; font-weight: bold;"></p>
         </div>
     </div>
 
-    <div class="controles-container">
-        <input type="text" id="pesquisaInput" class="barra-pesquisa" placeholder="🔍 Buscar cliente por nome ou telefone...">
-        
-        <div class="filtros-botoes" id="grupoFiltros">
-            <button class="btn-filtro ativo" data-filtro="todos">Todos</button>
-            <button class="btn-filtro" data-filtro="reservado">Aguardando Pagamento</button>
-            <button class="btn-filtro" data-filtro="pago">Aprovados</button>
+    <div id="telaDashboard">
+        <header>
+            <div class="header-topo">
+                <h1>Painel Admin</h1>
+                <div class="acoes-topo">
+                    <span class="badge-admin">✓ Autenticado</span>
+                    <button class="btn-logout" id="btnSair">Sair</button>
+                </div>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">Acompanhe suas vendas e aprove pagamentos em tempo real.</p>
+        </header>
+
+        <div class="metricas-container">
+            <div class="metrica-card">
+                <span class="metrica-titulo">Total Arrecadado</span>
+                <span class="metrica-valor" id="metricaReceita">R$ 0,00</span>
+            </div>
+            <div class="metrica-card sucesso">
+                <span class="metrica-titulo">Números Pagos</span>
+                <span class="metrica-valor" id="metricaPagos">0</span>
+            </div>
+            <div class="metrica-card alerta">
+                <span class="metrica-titulo">Aguardando PIX</span>
+                <span class="metrica-valor" id="metricaPendentes">0</span>
+            </div>
         </div>
+
+        <div class="controles-container">
+            <input type="text" id="pesquisaInput" class="barra-pesquisa" placeholder="🔍 Buscar cliente por nome ou telefone...">
+            
+            <div class="filtros-botoes" id="grupoFiltros">
+                <button class="btn-filtro ativo" data-filtro="todos">Todos</button>
+                <button class="btn-filtro" data-filtro="reservado">Aguardando Pagamento</button>
+                <button class="btn-filtro" data-filtro="pago">Aprovados</button>
+            </div>
+        </div>
+
+        <div id="loader">⏳ Sincronizando com o banco de dados...</div>
+
+        <div class="container-reservas" id="listaReservas"></div>
     </div>
-
-    <div id="loader">⏳ Sincronizando com o banco de dados...</div>
-
-    <div class="container-reservas" id="listaReservas"></div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             const VALOR_POR_PONTO = 3;
             const supabaseUrl = "https://iysgablefbfefytouecp.supabase.co";
             const supabaseKey = "sb_publishable_Y8TSowvn_dCl3JjRnQ3E2A_N8sL6v_T";
             const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+            // Elementos DOM
+            const telaLogin = document.getElementById('telaLogin');
+            const telaDashboard = document.getElementById('telaDashboard');
+            const btnEntrar = document.getElementById('btnEntrar');
+            const btnSair = document.getElementById('btnSair');
+            const emailAdmin = document.getElementById('emailAdmin');
+            const senhaAdmin = document.getElementById('senhaAdmin');
+            const msgErroLogin = document.getElementById('msgErroLogin');
 
             const listaReservas = document.getElementById('listaReservas');
             const loader = document.getElementById('loader');
@@ -154,6 +211,69 @@
             let dadosAgrupados = [];
             let filtroAtual = 'todos';
 
+            // =========================================
+            // VERIFICAÇÃO DE SESSÃO (Mantém logado)
+            // =========================================
+            async function checarSessao() {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (session) {
+                    mostrarDashboard();
+                } else {
+                    telaLogin.style.display = 'flex';
+                    telaDashboard.style.display = 'none';
+                }
+            }
+
+            // =========================================
+            // LÓGICA DE LOGIN E LOGOUT
+            // =========================================
+            btnEntrar.addEventListener('click', async () => {
+                const email = emailAdmin.value.trim();
+                const senha = senhaAdmin.value.trim();
+
+                if (!email || !senha) {
+                    mostrarErro("Preencha e-mail e senha.");
+                    return;
+                }
+
+                btnEntrar.innerText = "ENTRANDO...";
+                btnEntrar.disabled = true;
+
+                // Tenta fazer o login no Supabase
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: senha
+                });
+
+                if (error) {
+                    mostrarErro("E-mail ou senha incorretos.");
+                    btnEntrar.innerText = "ACESSAR PAINEL";
+                    btnEntrar.disabled = false;
+                } else {
+                    mostrarDashboard();
+                }
+            });
+
+            btnSair.addEventListener('click', async () => {
+                await supabaseClient.auth.signOut();
+                window.location.reload(); // Recarrega a página para voltar pro login
+            });
+
+            function mostrarErro(mensagem) {
+                msgErroLogin.innerText = mensagem;
+                msgErroLogin.style.display = 'block';
+            }
+
+            function mostrarDashboard() {
+                telaLogin.style.display = 'none';
+                telaDashboard.style.display = 'block';
+                document.title = "Dashboard - Rifa PRO";
+                carregarDados(); // Só carrega os dados depois que o login for aprovado
+            }
+
+            // =========================================
+            // LÓGICA DO DASHBOARD (Permanece igual)
+            // =========================================
             async function carregarDados() {
                 loader.style.display = 'block';
                 listaReservas.innerHTML = '';
@@ -257,11 +377,11 @@
                         
                         <div class="botoes-acao">
                             ${isPago ? `
-                                <button class="btn-link" onclick="gerarLinkRecibo('${cliente.telefone}')">🔗 Copiar Recibo</button>
+                                <button class="btn-acao btn-link" onclick="gerarLinkRecibo('${cliente.telefone}')">🔗 Copiar Recibo</button>
                             ` : `
-                                <button class="btn-aprovar" onclick="aprovar('${cliente.telefone}', '${cliente.numeros.join(',')}')">✅ Aprovar PIX</button>
+                                <button class="btn-acao btn-aprovar" onclick="aprovar('${cliente.telefone}', '${cliente.numeros.join(',')}')">✅ Aprovar PIX</button>
                             `}
-                            <button class="btn-cancelar" onclick="cancelar('${cliente.telefone}', '${cliente.numeros.join(',')}', ${isPago})">🗑️ Excluir</button>
+                            <button class="btn-acao btn-cancelar" onclick="cancelar('${cliente.telefone}', '${cliente.numeros.join(',')}', ${isPago})">🗑️ Excluir</button>
                         </div>
                     `;
                     listaReservas.appendChild(div);
@@ -287,16 +407,16 @@
             };
 
             window.gerarLinkRecibo = function(telefone) {
-                // CORREÇÃO APLICADA: Mantém o formato original e o envia de forma segura na URL
+                const telLimpo = telefone.replace(/\D/g, '');
                 const dominioUrl = window.location.origin + window.location.pathname.replace('admin.html', '');
                 const link = `${dominioUrl}recibo.html?telefone=${encodeURIComponent(telefone)}`;
-                
                 navigator.clipboard.writeText(link).then(() => {
                     alert('✅ Link copiado com sucesso!');
                 });
             };
 
-            carregarDados();
+            // INICIA O CÓDIGO VERIFICANDO SE JÁ ESTÁ LOGADO
+            checarSessao();
         });
     </script>
 </body>
