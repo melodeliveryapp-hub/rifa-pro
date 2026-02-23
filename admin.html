@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin - Rifa</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        :root {
+            --cor-fundo: #f4f7f6;
+            --cor-primaria: #007bff;
+            --cor-sucesso: #28a745;
+            --cor-perigo: #dc3545;
+            --cor-alerta: #ffc107;
+            --cor-texto: #333;
+            --cor-branco: #fff;
+            --sombra: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--cor-fundo); color: var(--cor-texto); padding: 20px; }
+
+        header {
+            background-color: var(--cor-branco);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: var(--sombra);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .barra-pesquisa {
+            width: 100%;
+            max-width: 500px;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-top: 15px;
+            outline: none;
+        }
+
+        .barra-pesquisa:focus { border-color: var(--cor-primaria); }
+
+        .container-reservas {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .cartao-reserva {
+            background-color: var(--cor-branco);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: var(--sombra);
+            border-left: 5px solid var(--cor-alerta); /* Amarelo padrão para reservado */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Borda verde para quando estiver pago */
+        .cartao-reserva.pago {
+            border-left-color: var(--cor-sucesso);
+        }
+
+        .cartao-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .nome-cliente { font-size: 1.2rem; font-weight: bold; color: var(--cor-primaria); }
+        
+        .status-badge {
+            background-color: var(--cor-alerta);
+            color: #000;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        /* Fundo verde para a etiqueta "pago" */
+        .status-badge.pago { background-color: var(--cor-sucesso); color: white; }
+
+        .info-cliente { font-size: 0.95rem; margin-bottom: 15px; color: #555; flex-grow: 1; }
+        .info-cliente strong { color: #333; }
+
+        .numeros-lista {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .numero-tag {
+            background-color: #e2e8f0;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .botoes-acao {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: auto;
+        }
+
+        button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            transition: opacity 0.2s;
+            text-align: center;
+        }
+
+        button:hover { opacity: 0.8; }
+        .btn-aprovar { background-color: var(--cor-sucesso); min-width: 45%; }
+        .btn-cancelar { background-color: var(--cor-perigo); min-width: 45%; }
+        .btn-link { background-color: var(--cor-primaria); width: 100%; margin-bottom: 5px; }
+
+        /* Loader simples */
+        #loader { text-align: center; margin-top: 50px; font-weight: bold; color: var(--cor-primaria); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Painel de Gerenciamento</h1>
+        <p>Controle suas reservas e pagamentos</p>
+        <input type="text" id="pesquisaInput" class="barra-pesquisa" placeholder="Pesquisar por nome ou telefone...">
+    </header>
+
+    <div id="loader">Carregando dados do banco...</div>
+
+    <div class="container-reservas" id="listaReservas">
+        </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Conexão Supabase
+            const supabaseUrl = "https://iysgablefbfefytouecp.supabase.co";
+            const supabaseKey = "sb_publishable_Y8TSowvn_dCl3JjRnQ3E2A_N8sL6v_T";
+            const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+            const listaReservas = document.getElementById('listaReservas');
+            const loader = document.getElementById('loader');
+            const pesquisaInput = document.getElementById('pesquisaInput');
+            
+            let dadosAgrupados = [];
+
+            // 2. Buscar Dados
+            async function carregarDados() {
+                loader.style.display = 'block';
+                listaReservas.innerHTML = '';
+
+                // Busca quem não está 'livre'
+                const { data, error } = await supabaseClient
+                    .from('numeros')
+                    .select('*')
+                    .neq('status', 'livre');
+
+                if (error) {
+                    console.error("Erro ao buscar", error);
+                    loader.innerText = "Erro ao carregar dados.";
+                    return;
+                }
+
+                agruparEProcessar(data);
+                renderizarCartoes(dadosAgrupados);
+                loader.style.display = 'none';
+            }
+
+            // 3. Agrupar números pelo telefone do cliente
+            function agruparEProcessar(dadosBrutos) {
+                const mapa = {};
+
+                dadosBrutos.forEach(item => {
+                    const chave = item.telefone_cliente;
+                    if (!mapa[chave]) {
+                        mapa[chave] = {
+                            nome: item.nome_cliente,
+                            telefone: item.telefone_cliente,
+                            status: item.status, 
+                            numeros: []
+                        };
+                    }
+                    mapa[chave].numeros.push(item.numero);
+                });
+
+                dadosAgrupados = Object.values(mapa);
+            }
+
+            // 4. Renderizar a Tela
+            function renderizarCartoes(dadosParaRenderizar) {
+                listaReservas.innerHTML = '';
+
+                if (dadosParaRenderizar.length === 0) {
+                    listaReservas.innerHTML = '<p style="text-align:center; width: 100%; color: #666;">Nenhuma reserva encontrada.</p>';
+                    return;
+                }
+
+                dadosParaRenderizar.forEach(cliente => {
+                    cliente.numeros.sort();
+                    
+                    // Agora validamos se o status é 'pago' (ou 'vendido' para evitar bugs com registros antigos)
+                    const isPago = cliente.status === 'pago' || cliente.status === 'vendido';
+                    const totalR$ = cliente.numeros.length * 3;
+
+                    const div = document.createElement('div');
+                    div.className = `cartao-reserva ${isPago ? 'pago' : ''}`;
+                    
+                    div.innerHTML = `
+                        <div class="cartao-header">
+                            <span class="nome-cliente">${cliente.nome}</span>
+                            <span class="status-badge ${isPago ? 'pago' : ''}">${isPago ? 'PAGO' : cliente.status}</span>
+                        </div>
+                        <div class="info-cliente">
+                            <p><strong>Telefone:</strong> ${cliente.telefone}</p>
+                            <p><strong>Total:</strong> R$ ${totalR$},00 (${cliente.numeros.length} números)</p>
+                        </div>
+                        <div class="numeros-lista">
+                            ${cliente.numeros.map(n => `<span class="numero-tag">${n}</span>`).join('')}
+                        </div>
+                        
+                        <div class="botoes-acao">
+                            ${isPago ? `
+                                <button class="btn-link" onclick="gerarLinkRecibo('${cliente.telefone}')">Copiar Link do Recibo</button>
+                            ` : `
+                                <button class="btn-aprovar" onclick="aprovar('${cliente.telefone}', '${cliente.numeros.join(',')}')">Aprovar (Baixa)</button>
+                            `}
+                            
+                            <button class="btn-cancelar" onclick="cancelar('${cliente.telefone}', '${cliente.numeros.join(',')}', ${isPago})">Liberar</button>
+                        </div>
+                    `;
+                    listaReservas.appendChild(div);
+                });
+            }
+
+            // 5. Função de Pesquisa
+            pesquisaInput.addEventListener('input', (e) => {
+                const termo = e.target.value.toLowerCase();
+                const filtrados = dadosAgrupados.filter(cliente => 
+                    cliente.nome.toLowerCase().includes(termo) || 
+                    cliente.telefone.includes(termo)
+                );
+                renderizarCartoes(filtrados);
+            });
+
+            // 6. Ações Globais (Aprovar e Cancelar)
+            window.aprovar = async function(telefone, numerosStr) {
+                if(!confirm('Confirmar o pagamento deste cliente?')) return;
+                
+                const numeros = numerosStr.split(',');
+                
+                // Agora salva o status oficial como 'pago'
+                await supabaseClient
+                    .from('numeros')
+                    .update({ status: 'pago' })
+                    .in('numero', numeros);
+                
+                carregarDados();
+            };
+
+            window.cancelar = async function(telefone, numerosStr, isPago) {
+                // Aviso diferente dependendo do status atual do cliente
+                if (isPago) {
+                    if(!confirm('🚨 ALERTA CRÍTICO: Este cliente já estava marcado como PAGO. Tem certeza absoluta que deseja cancelar esta compra e liberar os números?')) return;
+                } else {
+                    if(!confirm('Deseja cancelar esta reserva pendente e liberar os números?')) return;
+                }
+                
+                const numeros = numerosStr.split(',');
+                
+                await supabaseClient
+                    .from('numeros')
+                    .update({ status: 'livre', nome_cliente: null, telefone_cliente: null })
+                    .in('numero', numeros);
+                
+                carregarDados();
+            };
+
+            // 7. Gerar link de retorno para o cliente
+            window.gerarLinkRecibo = function(telefone) {
+                const dominioUrl = window.location.origin; 
+                // Assumindo que o arquivo se chama recibo.html e está na mesma pasta
+                const link = `${dominioUrl}/recibo.html?telefone=${encodeURIComponent(telefone)}`;
+                
+                navigator.clipboard.writeText(link).then(() => {
+                    alert('Link copiado! Envie para o cliente no WhatsApp:\n\n' + link);
+                });
+            };
+
+            carregarDados();
+        });
+    </script>
+</body>
+</html>
