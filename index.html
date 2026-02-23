@@ -5,150 +5,145 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RIFA IMPERDÍVEL - Concorra a R$200,00</title>
     
+    <link rel="icon" type="image/png" href="favicon.png">
+    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
 
     <style>
-        /* =========================================
-           Variáveis de Cores e Estilo
-           ========================================= */
         :root {
-            --cor-fundo: #f8f9fa;
-            --cor-primaria-azul: #007bff;
-            --cor-secundaria-verde: #28a745;
-            --cor-alerta-amarelo: #ffc107;
-            --cor-texto-escuro: #333333;
-            --cor-texto-claro: #6c757d;
-            --cor-branco: #ffffff;
-            --borda-raio: 12px;
-            --sombra-leve: 0 4px 10px rgba(0, 0, 0, 0.08);
-            --sombra-hover: 0 8px 20px rgba(0, 0, 0, 0.15);
+            --bg-main: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-deep: #020617;
+            --gold: #fbbf24;
+            --gold-hover: #f59e0b;
+            --green: #10b981;
+            --green-glow: rgba(16, 185, 129, 0.5);
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-gold-thin: 1px solid rgba(251, 191, 36, 0.3);
+            --border-light-thin: 1px solid rgba(255, 255, 255, 0.1);
+            --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            --borda-raio: 16px;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: var(--cor-fundo); color: var(--cor-texto-escuro); padding-bottom: 90px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body { 
+            background: radial-gradient(circle at top center, var(--bg-secondary), var(--bg-main));
+            color: var(--text-light); 
+            padding-bottom: 100px; 
+            min-height: 100vh;
+        }
 
-        /* =========================================
-           Tela de Carregamento (Bloqueio Inicial)
-           ========================================= */
         .tela-carregamento {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: var(--cor-fundo); z-index: 9999;
+            background-color: var(--bg-main); z-index: 9999;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
         .spinner {
-            border: 4px solid #e2e8f0; border-top: 4px solid var(--cor-primaria-azul);
-            border-radius: 50%; width: 40px; height: 40px;
-            animation: girar 1s linear infinite; margin-bottom: 15px;
+            border: 3px solid rgba(251, 191, 36, 0.2); border-top: 3px solid var(--gold);
+            border-radius: 50%; width: 50px; height: 50px;
+            animation: girar 1s linear infinite; margin-bottom: 20px;
         }
         @keyframes girar { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* =========================================
-           Cabeçalho
-           ========================================= */
-        header {
-            background-color: var(--cor-branco); text-align: center;
-            padding: 20px 20px; box-shadow: var(--sombra-leve);
-            border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;
-        }
-        h1 { color: var(--cor-primaria-azul); font-size: 1.8rem; font-weight: 900; letter-spacing: 1px; }
+        header { text-align: center; padding: 30px 20px 10px; }
+        h1 { color: var(--gold); font-size: 1.5rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 2px 10px rgba(251, 191, 36, 0.2); }
 
-        /* =========================================
-           Container Principal e Banner Imagem
-           ========================================= */
-        main { max-width: 800px; margin: 0 auto; padding: 0 15px; }
-
-        .container-banner { margin: 20px 0; text-align: center; }
+        .container-banner { margin: 20px auto; max-width: 800px; padding: 0 15px; text-align: center; }
         .imagem-banner {
             width: 100%; height: auto; max-height: 400px;
-            border-radius: var(--borda-raio); box-shadow: var(--sombra-leve);
-            object-fit: cover; display: block;
+            border-radius: var(--borda-raio); border: var(--border-gold-thin);
+            box-shadow: var(--shadow-premium); object-fit: cover; display: block;
         }
 
-        /* Legenda de Cores */
-        .legenda { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
-        .item-legenda { display: flex; align-items: center; font-size: 0.85rem; font-weight: 600; color: var(--cor-texto-claro); }
-        .bolinha { width: 12px; height: 12px; border-radius: 50%; margin-right: 6px; }
-        .bolinha.livre { background-color: var(--cor-branco); border: 2px solid #e2e8f0; }
-        .bolinha.selecionado { background-color: var(--cor-secundaria-verde); }
-        .bolinha.reservado { background-color: var(--cor-alerta-amarelo); }
-        .bolinha.pago { background-color: #cbd5e1; }
+        main { max-width: 800px; margin: 0 auto; padding: 20px 15px; }
 
-        .grid-numeros { display: grid; grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)); gap: 10px; justify-content: center; }
+        .legenda { display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
+        .item-legenda { display: flex; align-items: center; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
+        .bolinha { width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
+        .bolinha.livre { background-color: var(--bg-secondary); border: var(--border-gold-thin); }
+        .bolinha.selecionado { background-color: var(--green); box-shadow: 0 0 10px var(--green-glow); }
+        .bolinha.reservado { background-color: rgba(251, 191, 36, 0.2); border: 1px solid rgba(251, 191, 36, 0.4); }
+        .bolinha.pago { background-color: rgba(255, 255, 255, 0.1); border: 1px solid transparent; }
 
-        /* Botões de Números */
+        .grid-numeros { display: grid; grid-template-columns: repeat(auto-fill, minmax(62px, 1fr)); gap: 10px; justify-content: center; }
+
         .numero {
-            background-color: var(--cor-branco); border: 2px solid #e2e8f0;
-            color: var(--cor-texto-escuro); font-size: 1.1rem; font-weight: 700;
-            padding: 15px 0; border-radius: 8px; cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: all 0.2s ease;
-            appearance: none; outline: none;
+            background-color: var(--bg-secondary); border: var(--border-gold-thin); color: var(--text-light);
+            font-size: 1.1rem; font-weight: 700; aspect-ratio: 1 / 1;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 12px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.2);
         }
-        .numero.livre:hover { border-color: var(--cor-primaria-azul); color: var(--cor-primaria-azul); transform: translateY(-2px); }
-        .numero.selecionado { background-color: var(--cor-secundaria-verde); border-color: var(--cor-secundaria-verde); color: var(--cor-branco); transform: translateY(-2px); box-shadow: var(--sombra-hover); }
-        .numero.reservado { background-color: #fff3cd; border-color: #ffeeba; color: #856404; cursor: not-allowed; }
-        .numero.pago { background-color: #e2e8f0; border-color: #cbd5e1; color: #94a3b8; cursor: not-allowed; text-decoration: line-through; box-shadow: none; }
+        .numero.livre:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-3px); box-shadow: 0 10px 20px -10px rgba(251, 191, 36, 0.3); }
+        .numero.selecionado { background-color: var(--green); border-color: var(--green); color: #fff; transform: translateY(-3px); box-shadow: 0 0 15px var(--green-glow); }
+        .numero.reservado { background-color: rgba(251, 191, 36, 0.15); border-color: transparent; color: var(--gold); cursor: not-allowed; }
+        .numero.pago { background-color: rgba(255, 255, 255, 0.05); border-color: transparent; color: rgba(255, 255, 255, 0.2); cursor: not-allowed; text-decoration: line-through; box-shadow: none; }
 
-        /* =========================================
-           Barra Inferior Fixa
-           ========================================= */
         .barra-inferior {
             position: fixed; bottom: 0; left: 0; width: 100%;
-            background-color: var(--cor-branco); box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.08);
-            padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
-            border-top-left-radius: 20px; border-top-right-radius: 20px; z-index: 1000;
+            background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(10px);
+            border-top: var(--border-light-thin); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 1000;
         }
         .resumo-selecao { display: flex; flex-direction: column; }
-        .resumo-valor { font-size: 1.1rem; font-weight: 800; color: var(--cor-primaria-azul); }
+        .resumo-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; }
+        .resumo-valor { font-size: 1.3rem; font-weight: 900; color: var(--gold); }
+        
         .btn-primario {
-            background-color: var(--cor-secundaria-verde); color: var(--cor-branco); border: none; padding: 14px 24px;
-            font-size: 1rem; font-weight: 700; border-radius: 30px; cursor: pointer; box-shadow: var(--sombra-leve); transition: 0.2s ease;
+            background: linear-gradient(135deg, var(--green), #059669); color: #fff; border: none; padding: 14px 28px;
+            font-size: 1rem; font-weight: 800; border-radius: 30px; cursor: pointer; 
+            box-shadow: 0 4px 15px var(--green-glow); transition: 0.3s ease; text-transform: uppercase; letter-spacing: 1px;
         }
-        .btn-primario:hover { background-color: #218838; transform: scale(1.02); }
-        .btn-primario:disabled { background-color: #6c757d; cursor: not-allowed; transform: none; }
+        .btn-primario:hover { filter: brightness(1.1); transform: scale(1.02); }
+        .btn-primario:disabled { background: #334155; color: #64748b; cursor: not-allowed; transform: none; box-shadow: none; }
 
-        /* =========================================
-           Estilos do Modal (Checkout)
-           ========================================= */
         .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.7); display: none;
-            justify-content: center; align-items: center; z-index: 2000;
-            backdrop-filter: blur(3px); padding: 15px;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(2, 6, 23, 0.9); display: none;
+            justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(5px); padding: 15px;
         }
         .modal-overlay.ativo { display: flex; }
+        
         .modal-content {
-            background-color: var(--cor-branco); width: 100%; max-width: 420px;
-            border-radius: var(--borda-raio); box-shadow: 0 15px 30px rgba(0,0,0,0.3);
-            overflow: hidden; animation: deslizar 0.3s ease-out; position: relative;
+            background-color: var(--bg-secondary); width: 100%; max-width: 420px; border-radius: 20px;
+            box-shadow: var(--shadow-premium); border: var(--border-light-thin); overflow: hidden; animation: deslizar 0.3s ease-out; position: relative;
         }
-        @keyframes deslizar { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid #f1f5f9; }
-        .modal-header h3 { color: var(--cor-primaria-azul); font-size: 1.2rem; }
-        .btn-fechar { background: none; border: none; font-size: 1.8rem; color: var(--cor-texto-claro); cursor: pointer; }
-        .modal-body { padding: 20px; }
-        .input-group { margin-bottom: 15px; display: flex; flex-direction: column; }
-        .input-group label { font-size: 0.9rem; font-weight: 700; margin-bottom: 5px; }
-        .input-group input { padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; outline: none; }
-        .input-group input:focus { border-color: var(--cor-primaria-azul); }
+        @keyframes deslizar { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: var(--border-light-thin); }
+        .modal-header h3 { color: var(--text-light); font-size: 1.2rem; font-weight: 700; }
+        .btn-fechar { background: none; border: none; font-size: 1.8rem; color: var(--text-muted); cursor: pointer; transition: color 0.2s; }
+        .btn-fechar:hover { color: var(--text-light); }
+        
+        .modal-body { padding: 25px 20px; }
+        
+        .input-group { margin-bottom: 20px; display: flex; flex-direction: column; }
+        .input-group label { font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; color: var(--text-muted); }
+        .input-group input { 
+            background-color: var(--bg-deep); border: 1px solid #334155; color: var(--text-light);
+            padding: 15px; border-radius: 10px; font-size: 1rem; outline: none; transition: all 0.3s; 
+        }
+        .input-group input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1); }
+        .input-group input::placeholder { color: #475569; }
 
-        /* Estilos do Passo 2 (Pagamento) */
-        .box-resumo { background-color: #f8f9fa; border-radius: 8px; padding: 15px; margin-bottom: 20px; text-align: center; border: 1px solid #e2e8f0; }
-        .box-resumo h4 { color: var(--cor-texto-claro); font-size: 0.9rem; margin-bottom: 5px; }
-        .box-resumo .valor-destaque { font-size: 1.8rem; color: var(--cor-secundaria-verde); font-weight: 900; }
-        .box-pix { background-color: #fff3cd; border: 2px dashed #ffeeba; border-radius: 8px; padding: 15px; text-align: center; margin-bottom: 20px; }
-        .box-pix p { font-size: 0.9rem; color: #856404; margin-bottom: 10px; font-weight: bold; }
-        .chave-pix { font-family: monospace; font-size: 1.1rem; background: #fff; padding: 10px; border-radius: 6px; border: 1px solid #ffeeba; margin-bottom: 10px; word-break: break-all; }
-        .btn-copiar { background-color: #ffc107; color: #000; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem; }
-        .btn-copiar:hover { background-color: #e0a800; }
+        .box-resumo { background-color: var(--bg-deep); border-radius: 12px; padding: 20px; margin-bottom: 25px; text-align: center; border: 1px solid #334155; }
+        .box-resumo h4 { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 5px; text-transform: uppercase; }
+        .box-resumo .valor-destaque { font-size: 2.2rem; color: var(--green); font-weight: 900; text-shadow: 0 0 15px var(--green-glow); }
+        .box-resumo p { color: var(--text-muted); font-size: 0.9rem; }
+
+        .box-pix { background-color: rgba(251, 191, 36, 0.05); border: 1px dashed var(--gold); border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 25px; }
+        .box-pix p.titulo-pix { font-size: 1rem; color: var(--gold); margin-bottom: 15px; font-weight: 700; }
+        .chave-pix { font-family: monospace; font-size: 1.1rem; background: var(--bg-deep); color: var(--text-light); padding: 15px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 15px; word-break: break-all; }
+        .btn-copiar { background-color: var(--gold); color: var(--bg-deep); border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 800; font-size: 0.95rem; transition: all 0.2s; }
+        .btn-copiar:hover { background-color: var(--gold-hover); box-shadow: 0 5px 15px rgba(251, 191, 36, 0.3); }
 
         .passo { display: none; }
         .passo.ativo { display: block; }
-        .btn-voltar-passo { background: none; border: none; color: var(--cor-texto-claro); text-decoration: underline; cursor: pointer; margin-top: 15px; width: 100%; text-align: center; }
+        .btn-voltar-passo { background: none; border: none; color: var(--text-muted); text-decoration: underline; cursor: pointer; margin-top: 20px; width: 100%; text-align: center; font-size: 0.9rem; }
+        .btn-voltar-passo:hover { color: var(--text-light); }
 
         @media (min-width: 768px) {
-            header, .barra-inferior { max-width: 800px; margin: 0 auto; }
-            header { margin-top: 20px; border-radius: var(--borda-raio); }
-            .barra-inferior { left: 50%; transform: translateX(-50%); border-radius: var(--borda-raio) var(--borda-raio) 0 0; }
+            .barra-inferior { left: 50%; transform: translateX(-50%); max-width: 800px; border-radius: 20px 20px 0 0; border-left: var(--border-light-thin); border-right: var(--border-light-thin); }
         }
     </style>
 </head>
@@ -156,7 +151,6 @@
 
     <div id="telaCarregamento" class="tela-carregamento">
         <div class="spinner"></div>
-        <p style="font-weight: bold; color: var(--cor-texto-escuro);">Preparando Rifa...</p>
     </div>
 
     <header>
@@ -165,26 +159,25 @@
 
     <main>
         <div class="container-banner">
-            <img src="banner.png" alt="Banner da Rifa" class="imagem-banner" id="bannerImagem">
-            
-            <p style="font-size: 0.8rem; color: #999; margin-top: 5px;">*Para trocar o banner, edite o código HTML na linha do img src="..."</p>
+            <img src="banner.png" alt="Banner da Rifa" class="imagem-banner">
         </div>
 
         <div class="legenda">
-            <div class="item-legenda"><div class="bolinha livre"></div> Livre</div>
+            <div class="item-legenda"><div class="bolinha livre"></div> Disponível</div>
+            <div class="item-legenda"><div class="bolinha selecionado"></div> Selecionado</div>
             <div class="item-legenda"><div class="bolinha reservado"></div> Reservado</div>
             <div class="item-legenda"><div class="bolinha pago"></div> Pago</div>
         </div>
 
-        <div class="grid-numeros" id="gridNumeros">
-            </div>
+        <div class="grid-numeros" id="gridNumeros"></div>
     </main>
 
     <footer class="barra-inferior">
         <div class="resumo-selecao">
-            <span class="resumo-valor" id="totalSelecionado">0 números | R$ 0,00</span>
+            <span class="resumo-label">Total a pagar</span>
+            <span class="resumo-valor" id="totalSelecionado">R$ 0,00</span>
         </div>
-        <button class="btn-primario" id="btnAbrirModal">Comprar</button>
+        <button class="btn-primario" id="btnAbrirModal">FINALIZAR COMPRA</button>
     </footer>
 
     <div class="modal-overlay" id="modalOverlay">
@@ -196,10 +189,10 @@
             
             <div class="modal-body">
                 <div id="passo1" class="passo ativo">
-                    <p style="color: #6c757d; margin-bottom: 15px; font-size: 0.95rem;">Preencha seus dados para garantir seus números.</p>
+                    <p style="color: var(--text-muted); margin-bottom: 25px; font-size: 0.95rem; line-height: 1.5;">Preencha seus dados abaixo para garantir a reserva dos seus números com segurança.</p>
                     <div class="input-group">
                         <label for="nomeCliente">Nome completo</label>
-                        <input type="text" id="nomeCliente" placeholder="Como devemos te chamar?" required>
+                        <input type="text" id="nomeCliente" placeholder="Digite seu nome" required>
                     </div>
                     <div class="input-group">
                         <label for="telefoneCliente">WhatsApp</label>
@@ -210,23 +203,23 @@
 
                 <div id="passo2" class="passo">
                     <div class="box-resumo">
-                        <h4>Total a pagar:</h4>
+                        <h4>Valor Total da Compra</h4>
                         <div class="valor-destaque" id="valorModalPagamento">R$ 0,00</div>
-                        <p style="font-size: 0.85rem; color: #666; margin-top: 5px;" id="numerosModalPagamento">Números: --</p>
+                        <p id="numerosModalPagamento">Números: --</p>
                     </div>
 
                     <div class="box-pix">
-                        <p>Copie a chave abaixo e faça o PIX:</p>
+                        <p class="titulo-pix">Pagamento via PIX Copia e Cola</p>
                         <div class="chave-pix" id="textoChavePix">SUA_CHAVE_AQUI</div>
-                        <button class="btn-copiar" id="btnCopiarPix">📋 Copiar Chave PIX</button>
+                        <button class="btn-copiar" id="btnCopiarPix">COPIAR CHAVE PIX</button>
                     </div>
 
-                    <p style="font-size: 0.85rem; text-align: center; color: #666; margin-bottom: 15px;">
-                        Após o pagamento, clique no botão abaixo para nos enviar o comprovante no WhatsApp.
+                    <p style="font-size: 0.9rem; text-align: center; color: var(--text-muted); margin-bottom: 20px; line-height: 1.4;">
+                        Após realizar o pagamento no seu banco, clique no botão abaixo para enviar o comprovante em nosso WhatsApp.
                     </p>
 
-                    <button class="btn-primario" style="width: 100%;" id="btnFinalizarReserva">Já paguei, enviar comprovante!</button>
-                    <button class="btn-voltar-passo" id="btnVoltarPasso1">Voltar e editar dados</button>
+                    <button class="btn-primario" style="width: 100%;" id="btnFinalizarReserva">ENVIAR COMPROVANTE</button>
+                    <button class="btn-voltar-passo" id="btnVoltarPasso1">Voltar e corrigir dados</button>
                 </div>
             </div>
         </div>
@@ -234,9 +227,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // =========================================
-            // CONFIGURAÇÕES GERAIS E SUPABASE
-            // =========================================
             const CHAVE_PIX = "889999465376"; 
             const TELEFONE_WHATSAPP = "5588999465376"; 
             const VALOR_POR_PONTO = 3;
@@ -266,19 +256,11 @@
 
             textoChavePix.innerText = CHAVE_PIX;
 
-            // =========================================
-            // MÁSCARA DO TELEFONE
-            // =========================================
             telefoneClienteInput.addEventListener('input', function (e) {
-                // Remove tudo que não é número
                 let x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,5})(\d{0,4})/);
-                // Aplica o formato (00) 00000-0000
                 e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
             });
 
-            // =========================================
-            // GERAÇÃO DOS NÚMEROS E BUSCA NO BANCO
-            // =========================================
             for (let i = 1; i <= 200; i++) {
                 const btn = document.createElement('button');
                 btn.classList.add('numero', 'livre');
@@ -301,7 +283,6 @@
                             const botao = document.getElementById(`btn-numero-${numStr}`);
 
                             if (botao) {
-                                // Trava de Segurança dupla
                                 if (registro.status === 'pago' || registro.status === 'vendido') {
                                     botao.className = 'numero pago';
                                 } else if (registro.status === 'reservado') {
@@ -313,20 +294,16 @@
                 } catch (err) {
                     console.error('Falha de conexão:', err);
                 } finally {
-                    // Independente de dar erro ou sucesso, tira a tela de carregamento para liberar o site
                     telaCarregamento.style.display = 'none';
                 }
             }
 
-            // =========================================
-            // INTERAÇÃO E CÁLCULOS
-            // =========================================
             function atualizarResumo() {
                 const selecionados = document.querySelectorAll('.numero.selecionado');
                 const qtd = selecionados.length;
                 const total = qtd * VALOR_POR_PONTO;
-                totalSelecionadoEl.innerText = `${qtd} números | R$ ${total},00`;
                 
+                totalSelecionadoEl.innerText = `R$ ${total},00`;
                 valorModalPagamento.innerText = `R$ ${total},00`;
                 const arrayNumeros = Array.from(selecionados).map(b => b.innerText);
                 numerosModalPagamento.innerText = `Números: ${arrayNumeros.join(', ')}`;
@@ -341,12 +318,9 @@
                 });
             });
 
-            // =========================================
-            // LÓGICA DO MODAL
-            // =========================================
             btnAbrirModal.addEventListener('click', () => {
                 if (document.querySelectorAll('.numero.selecionado').length === 0) {
-                    alert('Selecione pelo menos um número livre para comprar.');
+                    alert('Selecione pelo menos um número disponível para comprar.');
                     return;
                 }
                 passo1.classList.add('ativo');
@@ -375,20 +349,17 @@
 
             btnCopiarPix.addEventListener('click', () => {
                 navigator.clipboard.writeText(CHAVE_PIX).then(() => {
-                    btnCopiarPix.innerText = "✅ Chave Copiada!";
-                    btnCopiarPix.style.backgroundColor = "#28a745";
+                    btnCopiarPix.innerText = "CHAVE COPIADA!";
+                    btnCopiarPix.style.backgroundColor = "var(--green)";
                     btnCopiarPix.style.color = "#fff";
                     setTimeout(() => {
-                        btnCopiarPix.innerText = "📋 Copiar Chave PIX";
-                        btnCopiarPix.style.backgroundColor = "#ffc107";
+                        btnCopiarPix.innerText = "COPIAR CHAVE PIX";
+                        btnCopiarPix.style.backgroundColor = "var(--gold)";
                         btnCopiarPix.style.color = "#000";
                     }, 3000);
                 });
             });
 
-            // =========================================
-            // GRAVAÇÃO NO BANCO E REDIRECIONAMENTO
-            // =========================================
             btnFinalizarReserva.addEventListener('click', async () => {
                 const nome = nomeClienteInput.value.trim();
                 const telefone = telefoneClienteInput.value.trim();
@@ -396,7 +367,7 @@
                 const numerosEscolhidos = Array.from(selecionados).map(botao => botao.innerText);
                 const total = selecionados.length * VALOR_POR_PONTO;
 
-                btnFinalizarReserva.innerText = "Processando e abrindo WhatsApp...";
+                btnFinalizarReserva.innerText = "PROCESSANDO...";
                 btnFinalizarReserva.disabled = true;
 
                 try {
@@ -422,12 +393,11 @@
                 } catch (err) {
                     console.error('Erro ao salvar no Supabase:', err);
                     alert('Erro ao processar sua reserva. Tente novamente.');
-                    btnFinalizarReserva.innerText = "Já paguei, enviar comprovante!";
+                    btnFinalizarReserva.innerText = "ENVIAR COMPROVANTE";
                     btnFinalizarReserva.disabled = false;
                 }
             });
 
-            // Chama a função que inicia tudo e bloqueia a tela enquanto carrega
             carregarStatusDoBanco();
         });
     </script>

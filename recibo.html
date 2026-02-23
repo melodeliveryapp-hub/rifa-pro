@@ -5,59 +5,71 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recibo - Rifa Imperdível</title>
     
+    <link rel="icon" type="image/png" href="favicon.png">
+    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --cor-fundo: #f8f9fa;
-            --cor-primaria-azul: #007bff;
-            --cor-secundaria-verde: #28a745;
-            --cor-texto-escuro: #333333;
-            --cor-texto-claro: #6c757d;
-            --cor-branco: #ffffff;
-            --borda-raio: 12px;
-            --sombra-leve: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --bg-main: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-deep: #020617;
+            --gold: #fbbf24;
+            --green: #10b981;
+            --green-glow: rgba(16, 185, 129, 0.4);
+            --red: #ef4444;
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-light-thin: 1px solid rgba(255, 255, 255, 0.1);
+            --border-gold-thin: 1px solid rgba(251, 191, 36, 0.4);
+            --sombra-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            --borda-raio: 20px;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: var(--cor-fundo); color: var(--cor-texto-escuro); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: radial-gradient(circle at top center, var(--bg-secondary), var(--bg-main)); color: var(--text-light); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
 
         .recibo-cartao {
-            background-color: var(--cor-branco); width: 100%; max-width: 450px;
-            border-radius: var(--borda-raio); box-shadow: var(--sombra-leve);
-            padding: 40px 30px; text-align: center; animation: surgir 0.5s ease-out;
+            background-color: var(--bg-secondary); width: 100%; max-width: 450px;
+            border-radius: var(--borda-raio); box-shadow: var(--sombra-premium);
+            border: var(--border-light-thin); padding: 40px 30px; text-align: center; animation: surgir 0.5s ease-out;
         }
 
         @keyframes surgir { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 
         .icone-sucesso {
-            width: 80px; height: 80px; background-color: #d4edda; color: var(--cor-secundaria-verde);
-            border-radius: 50%; display: flex; justify-content: center; align-items: center;
-            font-size: 2.5rem; margin: 0 auto 20px auto;
+            width: 80px; height: 80px; background-color: rgba(16, 185, 129, 0.1); color: var(--green);
+            border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            font-size: 2.5rem; margin: 0 auto 20px auto; box-shadow: 0 0 20px var(--green-glow);
         }
 
-        h1 { color: var(--cor-secundaria-verde); font-size: 1.8rem; margin-bottom: 10px; }
-        p.mensagem { color: var(--cor-texto-claro); font-size: 1.1rem; margin-bottom: 25px; line-height: 1.5; }
+        h1 { color: var(--green); font-size: 1.8rem; font-weight: 800; margin-bottom: 10px; }
+        p.mensagem { color: var(--text-muted); font-size: 1.1rem; margin-bottom: 25px; line-height: 1.5; }
+        p.mensagem strong { color: var(--text-light); }
 
-        .box-numeros { background-color: #f8f9fa; border: 2px dashed #cbd5e1; border-radius: 10px; padding: 20px; margin-bottom: 30px; }
-        .box-numeros h3 { font-size: 1rem; color: var(--cor-texto-escuro); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
+        .box-numeros { background-color: var(--bg-deep); border: var(--border-light-thin); border-radius: 12px; padding: 25px 20px; margin-bottom: 30px; }
+        .box-numeros h3 { font-size: 1rem; color: var(--gold); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
 
-        .grid-numeros-cliente { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+        .grid-numeros-cliente { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
         .numero-tag {
-            background-color: var(--cor-primaria-azul); color: var(--cor-branco);
-            font-size: 1.2rem; font-weight: bold; padding: 8px 15px; border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,123,255,0.3);
+            background-color: var(--bg-secondary); color: var(--gold);
+            font-size: 1.2rem; font-weight: bold; width: 50px; height: 50px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 10px; border: var(--border-gold-thin);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
         .btn-voltar {
-            display: inline-block; background-color: var(--cor-primaria-azul); color: var(--cor-branco);
-            text-decoration: none; padding: 14px 30px; border-radius: 30px; font-weight: bold;
-            font-size: 1rem; transition: background-color 0.3s; width: 100%;
+            display: inline-block; background-color: var(--green); color: #fff;
+            text-decoration: none; padding: 16px 30px; border-radius: 30px; font-weight: 800;
+            font-size: 1rem; transition: all 0.2s; width: 100%; text-transform: uppercase; letter-spacing: 1px;
+            box-shadow: 0 4px 15px var(--green-glow);
         }
-        .btn-voltar:hover { background-color: #0056b3; }
+        .btn-voltar:hover { background-color: #059669; transform: scale(1.02); }
 
         .escondido { display: none !important; }
-        .erro { color: #dc3545 !important; }
+        .erro { color: var(--red) !important; text-shadow: none; }
     </style>
 </head>
 <body>
@@ -65,7 +77,7 @@
     <div class="recibo-cartao">
         
         <div id="estadoCarregando">
-            <h2>Buscando seu recibo...</h2>
+            <h2 style="color: var(--gold); margin-bottom: 10px;">Buscando recibo...</h2>
             <p class="mensagem">Aguarde um instante.</p>
         </div>
 
@@ -84,10 +96,10 @@
         </div>
 
         <div id="estadoErro" class="escondido">
-            <div class="icone-sucesso" style="background-color: #f8d7da; color: #dc3545;">!</div>
+            <div class="icone-sucesso" style="background-color: rgba(239, 68, 68, 0.1); color: var(--red); border-color: rgba(239, 68, 68, 0.3); box-shadow: none;">!</div>
             <h1 class="erro">Recibo indisponível.</h1>
             <p class="mensagem">Não localizamos números confirmados para este link. Verifique com o administrador se o seu pagamento já foi aprovado.</p>
-            <a href="index.html" class="btn-voltar">Ir para a Rifa</a>
+            <a href="index.html" class="btn-voltar" style="background-color: var(--bg-deep); border: 1px solid var(--gold); color: var(--gold); box-shadow: none;">Ir para a Rifa</a>
         </div>
 
     </div>
@@ -113,7 +125,6 @@
             }
 
             try {
-                // Busca os números atrelados a este telefone
                 const { data, error } = await supabaseClient
                     .from('numeros')
                     .select('*')
@@ -121,7 +132,6 @@
 
                 if (error) throw error;
 
-                // Filtra apenas os que estão 'pago' ou 'vendido'
                 const numerosConfirmados = data.filter(item => item.status === 'pago' || item.status === 'vendido');
 
                 if (numerosConfirmados.length > 0) {
