@@ -36,20 +36,11 @@
 
         main { max-width: 800px; margin: 0 auto; padding: 10px 15px 20px; }
 
-        /* =========================================
-           AVISOS DE MARKETING DINÂMICOS
-           ========================================= */
         .painel-marketing { margin-bottom: 25px; display: flex; flex-direction: column; gap: 15px; }
-        
-        /* Banner de Cota Escondida */
         .banner-cota { display: none; background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(180, 83, 9, 0.2)); border: 1px dashed var(--gold); border-radius: 12px; padding: 15px; text-align: center; color: var(--gold); font-weight: 800; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; animation: piscar-borda 2s infinite; }
         @keyframes piscar-borda { 0%, 100% { box-shadow: 0 0 5px rgba(251, 191, 36, 0.2); } 50% { box-shadow: 0 0 15px rgba(251, 191, 36, 0.6); } }
-        
-        /* Mural de Ganhadores */
         .ganhador-cota { display: none; background-color: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 12px; text-align: center; color: var(--green); font-size: 0.9rem; line-height: 1.5; }
         .ganhador-cota strong { color: var(--text-light); }
-        
-        /* Barra de Escassez (> 50%) */
         .barra-progresso-container { display: none; background-color: var(--bg-deep); border: var(--border-light-thin); border-radius: 12px; padding: 15px; text-align: center; }
         .barra-texto { color: #f87171; font-weight: 800; font-size: 0.9rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; animation: pular 2s infinite; }
         @keyframes pular { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
@@ -124,20 +115,16 @@
         </div>
 
         <div class="painel-marketing">
-            
             <div class="banner-cota" id="boxCota">
                 ⚡ TEM COTA PREMIADA ESCONDIDA! Compre e ganhe na hora! ⚡
             </div>
-
             <div class="ganhador-cota" id="boxGanhadores"></div>
-
             <div class="barra-progresso-container" id="boxProgresso">
                 <div class="barra-texto">🔥 <span id="porcentagemTexto">50</span>% dos números vendidos! Corre!</div>
                 <div class="barra-fundo">
                     <div class="barra-preenchimento" id="barraPreenchimento"></div>
                 </div>
             </div>
-
         </div>
 
         <div class="legenda">
@@ -231,6 +218,9 @@
             const textoChavePix = document.getElementById('textoChavePix');
             const btnFinalizarReserva = document.getElementById('btnFinalizarReserva');
             const telaCarregamento = document.getElementById('telaCarregamento');
+
+            // VARIÁVEL NOVA: Guarda o ID do pedido que está sendo feito agora
+            let idPedidoAtual = '';
 
             textoChavePix.innerText = CHAVE_PIX;
 
@@ -347,7 +337,7 @@
             fecharModalBtn.addEventListener('click', () => modalOverlay.classList.remove('ativo'));
 
             // ========================================================
-            // A MÁGICA ACONTECE AQUI: BOTÃO "IR PARA PAGAMENTO"
+            // BOTÃO "IR PARA PAGAMENTO" (Gera o ID e avisa no Discord)
             // ========================================================
             btnAvancarPagamento.addEventListener('click', () => {
                 if (!nomeClienteInput.value.trim() || telefoneClienteInput.value.replace(/\D/g, '').length < 10) {
@@ -355,7 +345,9 @@
                     return;
                 }
 
-                // --- INÍCIO DO CÓDIGO DO DISCORD WEBHOOK ---
+                // GERA O ID ÚNICO DESTA COMPRA (Ex: PED-5X9A2B1C)
+                idPedidoAtual = 'PED-' + Math.random().toString(36).substring(2, 10).toUpperCase();
+
                 const nome = nomeClienteInput.value.trim();
                 const telefone = telefoneClienteInput.value.trim();
                 const selecionados = document.querySelectorAll('.numero.selecionado');
@@ -365,7 +357,7 @@
                 const DISCORD_WEBHOOK_URL = "https://discordapp.com/api/webhooks/1475820091810648156/eYImQUuUOtJ57MLVgOjhnEKBmaOShh06k0hJS4-zh8IznULXFbh51_4ETxQKSW0NQoqa"; 
                 
                 const msgDiscord = {
-                    content: `🚨 **CLIENTE NO CHECKOUT! (Aguardando PIX)**\n\n👤 **Cliente:** ${nome}\n📱 **WhatsApp:** ${telefone}\n🎟️ **Números:** ${numerosEscolhidos.join(', ')}\n💰 **Total:** R$ ${total},00\n\n👀 *O cliente acabou de ver a chave PIX. Se não enviar o comprovante logo, chame-o no WhatsApp para recuperar a venda!*`
+                    content: `🚨 **CLIENTE NO CHECKOUT! (Aguardando PIX)**\n\n🆔 **Pedido:** ${idPedidoAtual}\n👤 **Cliente:** ${nome}\n📱 **WhatsApp:** ${telefone}\n🎟️ **Números:** ${numerosEscolhidos.join(', ')}\n💰 **Total:** R$ ${total},00\n\n👀 *O cliente acabou de ver a chave PIX. Se não enviar o comprovante logo, chame-o no WhatsApp!*`
                 };
                 
                 fetch(DISCORD_WEBHOOK_URL, {
@@ -373,7 +365,6 @@
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(msgDiscord)
                 }).catch(err => console.error("Erro no Discord", err));
-                // --- FIM DO CÓDIGO DO DISCORD WEBHOOK ---
 
                 passo1.classList.remove('ativo');
                 passo2.classList.add('ativo');
@@ -399,6 +390,9 @@
                 });
             });
 
+            // ========================================================
+            // BOTÃO "ENVIAR COMPROVANTE" (Salva no banco com o ID novo)
+            // ========================================================
             btnFinalizarReserva.addEventListener('click', async () => {
                 const nome = nomeClienteInput.value.trim();
                 const telefone = telefoneClienteInput.value.trim();
@@ -410,15 +404,22 @@
                 btnFinalizarReserva.disabled = true;
 
                 try {
+                    // ATUALIZADO: Agora salva a coluna id_pedido junto com o resto!
                     const { error } = await supabaseClient
                         .from('numeros')
-                        .update({ status: 'reservado', nome_cliente: nome, telefone_cliente: telefone })
+                        .update({ 
+                            status: 'reservado', 
+                            nome_cliente: nome, 
+                            telefone_cliente: telefone,
+                            id_pedido: idPedidoAtual 
+                        })
                         .in('numero', numerosEscolhidos);
 
                     if (error) throw error;
 
                     const mensagem = `✅ *RESERVA REALIZADA*\n\n` +
                                      `Olá! Fiz a reserva na Rifa Imperdível.\n` +
+                                     `*Pedido:* ${idPedidoAtual}\n` +
                                      `*Nome:* ${nome}\n` +
                                      `*Números:* ${numerosEscolhidos.join(', ')}\n` +
                                      `*Total:* R$ ${total},00\n\n` +
