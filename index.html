@@ -252,7 +252,6 @@
 
             async function carregarStatusDoBanco() {
                 try {
-                    // Puxa também os dados de premiação agora
                     const { data, error } = await supabaseClient.from('numeros').select('*');
                     if (error) throw error;
 
@@ -265,7 +264,6 @@
                             const numStr = String(registro.numero).padStart(3, '0');
                             const botao = document.getElementById(`btn-numero-${numStr}`);
 
-                            // Lógica de Cores dos Botões
                             if (botao) {
                                 if (registro.status === 'pago' || registro.status === 'vendido') {
                                     botao.className = 'numero pago';
@@ -274,7 +272,6 @@
                                 }
                             }
 
-                            // Lógica do Marketing Automático
                             if (registro.status !== 'livre') {
                                 qtdVendidosEReservados++;
                             }
@@ -283,35 +280,27 @@
                                 if (registro.status === 'livre') {
                                     temCotaLivre = true;
                                 } else if (registro.status === 'pago' || registro.status === 'vendido') {
-                                    // Pega só o primeiro nome do cliente para não expor muito
                                     const primeiroNome = registro.nome_cliente ? registro.nome_cliente.split(' ')[0] : 'Alguém';
                                     listaGanhadores.push(`🏆 <strong>${primeiroNome}</strong> achou a cota ${registro.numero} e ganhou ${registro.valor_premio}!`);
                                 }
                             }
                         });
 
-                        // 1. Exibe o Mural de Ganhadores se alguém já pagou uma cota premiada
                         if (listaGanhadores.length > 0) {
                             const boxGanhadores = document.getElementById('boxGanhadores');
                             boxGanhadores.style.display = 'block';
                             boxGanhadores.innerHTML = listaGanhadores.join('<br>');
                         }
 
-                        // 2. Exibe o Banner de Aviso se ainda tiver prêmio livre
                         if (temCotaLivre) {
                             document.getElementById('boxCota').style.display = 'block';
                         }
 
-                        // 3. Lógica da Barra de 50% (Baseado em 200 números)
                         const porcentagemVendida = (qtdVendidosEReservados / 200) * 100;
                         if (porcentagemVendida >= 50) {
                             document.getElementById('boxProgresso').style.display = 'block';
                             document.getElementById('porcentagemTexto').innerText = Math.floor(porcentagemVendida);
-                            
-                            // Anima a barra enchendo suavemente
-                            setTimeout(() => {
-                                document.getElementById('barraPreenchimento').style.width = `${porcentagemVendida}%`;
-                            }, 500);
+                            setTimeout(() => { document.getElementById('barraPreenchimento').style.width = `${porcentagemVendida}%`; }, 500);
                         }
                     }
                 } catch (err) {
@@ -407,7 +396,7 @@
                     const DISCORD_WEBHOOK_URL = "https://discordapp.com/api/webhooks/1475820091810648156/eYImQUuUOtJ57MLVgOjhnEKBmaOShh06k0hJS4-zh8IznULXFbh51_4ETxQKSW0NQoqa"; 
                     
                     const msgDiscord = {
-                        content: `🚨 **NOVA RESERVA INICIADA**\n\n👤 **Cliente:** ${nome}\n📱 **WhatsApp:** ${telefone}\n🎟️ **Números:** ${numerosEscolhidos.join(', ')}\n💰 **Total:** R$ ${total},00\n\n👀 *Fique atento! Se o PIX não chegar, chame o cliente no Zap!*`
+                        content: `🚨 **NOVA RESERVA!**\n\n👤 **Cliente:** ${nome}\n📱 **WhatsApp:** ${telefone}\n🎟️ **Números:** ${numerosEscolhidos.join(', ')}\n💰 **Total:** R$ ${total},00\n\n👀 *Atenção: Se o comprovante não chegar, chame o cliente no WhatsApp!*`
                     };
                     
                     fetch(DISCORD_WEBHOOK_URL, {
@@ -441,5 +430,4 @@
         });
     </script>
 </body>
-
 </html>
