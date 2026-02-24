@@ -6,21 +6,15 @@
     <title>RIFA IMPERDÍVEL - Concorra a R$200,00</title>
     
     <link rel="icon" type="image/png" href="favicon.png">
-    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --bg-main: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-deep: #020617;
-            --gold: #fbbf24;
-            --gold-hover: #f59e0b;
-            --green: #10b981;
-            --green-glow: rgba(16, 185, 129, 0.5);
-            --text-light: #f8fafc;
-            --text-muted: #94a3b8;
+            --bg-main: #0f172a; --bg-secondary: #1e293b; --bg-deep: #020617;
+            --gold: #fbbf24; --gold-hover: #f59e0b;
+            --green: #10b981; --green-glow: rgba(16, 185, 129, 0.5);
+            --red: #ef4444; --text-light: #f8fafc; --text-muted: #94a3b8;
             --border-gold-thin: 1px solid rgba(251, 191, 36, 0.3);
             --border-light-thin: 1px solid rgba(255, 255, 255, 0.1);
             --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
@@ -28,37 +22,39 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        
-        body { 
-            background: radial-gradient(circle at top center, var(--bg-secondary), var(--bg-main));
-            color: var(--text-light); 
-            padding-bottom: 100px; 
-            min-height: 100vh;
-        }
+        body { background: radial-gradient(circle at top center, var(--bg-secondary), var(--bg-main)); color: var(--text-light); padding-bottom: 100px; min-height: 100vh; }
 
-        .tela-carregamento {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: var(--bg-main); z-index: 9999;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-        }
-        .spinner {
-            border: 3px solid rgba(251, 191, 36, 0.2); border-top: 3px solid var(--gold);
-            border-radius: 50%; width: 50px; height: 50px;
-            animation: girar 1s linear infinite; margin-bottom: 20px;
-        }
+        .tela-carregamento { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--bg-main); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .spinner { border: 3px solid rgba(251, 191, 36, 0.2); border-top: 3px solid var(--gold); border-radius: 50%; width: 50px; height: 50px; animation: girar 1s linear infinite; margin-bottom: 20px; }
         @keyframes girar { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         header { text-align: center; padding: 30px 20px 10px; }
         h1 { color: var(--gold); font-size: 1.5rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 2px 10px rgba(251, 191, 36, 0.2); }
 
         .container-banner { margin: 20px auto; max-width: 800px; padding: 0 15px; text-align: center; }
-        .imagem-banner {
-            width: 100%; height: auto; max-height: 400px;
-            border-radius: var(--borda-raio); border: var(--border-gold-thin);
-            box-shadow: var(--shadow-premium); object-fit: cover; display: block;
-        }
+        .imagem-banner { width: 100%; height: auto; max-height: 400px; border-radius: var(--borda-raio); border: var(--border-gold-thin); box-shadow: var(--shadow-premium); object-fit: cover; display: block; }
 
-        main { max-width: 800px; margin: 0 auto; padding: 20px 15px; }
+        main { max-width: 800px; margin: 0 auto; padding: 10px 15px 20px; }
+
+        /* =========================================
+           AVISOS DE MARKETING DINÂMICOS
+           ========================================= */
+        .painel-marketing { margin-bottom: 25px; display: flex; flex-direction: column; gap: 15px; }
+        
+        /* Banner de Cota Escondida */
+        .banner-cota { display: none; background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(180, 83, 9, 0.2)); border: 1px dashed var(--gold); border-radius: 12px; padding: 15px; text-align: center; color: var(--gold); font-weight: 800; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; animation: piscar-borda 2s infinite; }
+        @keyframes piscar-borda { 0%, 100% { box-shadow: 0 0 5px rgba(251, 191, 36, 0.2); } 50% { box-shadow: 0 0 15px rgba(251, 191, 36, 0.6); } }
+        
+        /* Mural de Ganhadores */
+        .ganhador-cota { display: none; background-color: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 12px; text-align: center; color: var(--green); font-size: 0.9rem; line-height: 1.5; }
+        .ganhador-cota strong { color: var(--text-light); }
+        
+        /* Barra de Escassez (> 50%) */
+        .barra-progresso-container { display: none; background-color: var(--bg-deep); border: var(--border-light-thin); border-radius: 12px; padding: 15px; text-align: center; }
+        .barra-texto { color: #f87171; font-weight: 800; font-size: 0.9rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; animation: pular 2s infinite; }
+        @keyframes pular { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+        .barra-fundo { width: 100%; height: 12px; background-color: var(--bg-secondary); border-radius: 10px; overflow: hidden; border: 1px solid #334155; }
+        .barra-preenchimento { height: 100%; background: linear-gradient(90deg, #ef4444, #f59e0b); width: 0%; transition: width 1.5s ease-in-out; border-radius: 10px; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
 
         .legenda { display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
         .item-legenda { display: flex; align-items: center; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
@@ -69,82 +65,47 @@
         .bolinha.pago { background-color: rgba(255, 255, 255, 0.1); border: 1px solid transparent; }
 
         .grid-numeros { display: grid; grid-template-columns: repeat(auto-fill, minmax(62px, 1fr)); gap: 10px; justify-content: center; }
-
-        .numero {
-            background-color: var(--bg-secondary); border: var(--border-gold-thin); color: var(--text-light);
-            font-size: 1.1rem; font-weight: 700; aspect-ratio: 1 / 1;
-            display: flex; align-items: center; justify-content: center;
-            border-radius: 12px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-        }
+        .numero { background-color: var(--bg-secondary); border: var(--border-gold-thin); color: var(--text-light); font-size: 1.1rem; font-weight: 700; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
         .numero.livre:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-3px); box-shadow: 0 10px 20px -10px rgba(251, 191, 36, 0.3); }
         .numero.selecionado { background-color: var(--green); border-color: var(--green); color: #fff; transform: translateY(-3px); box-shadow: 0 0 15px var(--green-glow); }
         .numero.reservado { background-color: rgba(251, 191, 36, 0.15); border-color: transparent; color: var(--gold); cursor: not-allowed; }
         .numero.pago { background-color: rgba(255, 255, 255, 0.05); border-color: transparent; color: rgba(255, 255, 255, 0.2); cursor: not-allowed; text-decoration: line-through; box-shadow: none; }
 
-        .barra-inferior {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(10px);
-            border-top: var(--border-light-thin); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 1000;
-        }
+        .barra-inferior { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(10px); border-top: var(--border-light-thin); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; }
         .resumo-selecao { display: flex; flex-direction: column; }
         .resumo-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; }
         .resumo-valor { font-size: 1.3rem; font-weight: 900; color: var(--gold); }
-        
-        .btn-primario {
-            background: linear-gradient(135deg, var(--green), #059669); color: #fff; border: none; padding: 14px 28px;
-            font-size: 1rem; font-weight: 800; border-radius: 30px; cursor: pointer; 
-            box-shadow: 0 4px 15px var(--green-glow); transition: 0.3s ease; text-transform: uppercase; letter-spacing: 1px;
-        }
+        .btn-primario { background: linear-gradient(135deg, var(--green), #059669); color: #fff; border: none; padding: 14px 28px; font-size: 1rem; font-weight: 800; border-radius: 30px; cursor: pointer; box-shadow: 0 4px 15px var(--green-glow); transition: 0.3s ease; text-transform: uppercase; letter-spacing: 1px; }
         .btn-primario:hover { filter: brightness(1.1); transform: scale(1.02); }
         .btn-primario:disabled { background: #334155; color: #64748b; cursor: not-allowed; transform: none; box-shadow: none; }
 
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(2, 6, 23, 0.9); display: none;
-            justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(5px); padding: 15px;
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(2, 6, 23, 0.9); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(5px); padding: 15px; }
         .modal-overlay.ativo { display: flex; }
-        
-        .modal-content {
-            background-color: var(--bg-secondary); width: 100%; max-width: 420px; border-radius: 20px;
-            box-shadow: var(--shadow-premium); border: var(--border-light-thin); overflow: hidden; animation: deslizar 0.3s ease-out; position: relative;
-        }
+        .modal-content { background-color: var(--bg-secondary); width: 100%; max-width: 420px; border-radius: 20px; box-shadow: var(--shadow-premium); border: var(--border-light-thin); overflow: hidden; animation: deslizar 0.3s ease-out; position: relative; }
         @keyframes deslizar { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        
         .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: var(--border-light-thin); }
         .modal-header h3 { color: var(--text-light); font-size: 1.2rem; font-weight: 700; }
         .btn-fechar { background: none; border: none; font-size: 1.8rem; color: var(--text-muted); cursor: pointer; transition: color 0.2s; }
         .btn-fechar:hover { color: var(--text-light); }
-        
         .modal-body { padding: 25px 20px; }
-        
         .input-group { margin-bottom: 20px; display: flex; flex-direction: column; }
         .input-group label { font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; color: var(--text-muted); }
-        .input-group input { 
-            background-color: var(--bg-deep); border: 1px solid #334155; color: var(--text-light);
-            padding: 15px; border-radius: 10px; font-size: 1rem; outline: none; transition: all 0.3s; 
-        }
+        .input-group input { background-color: var(--bg-deep); border: 1px solid #334155; color: var(--text-light); padding: 15px; border-radius: 10px; font-size: 1rem; outline: none; transition: all 0.3s; }
         .input-group input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1); }
-        .input-group input::placeholder { color: #475569; }
-
         .box-resumo { background-color: var(--bg-deep); border-radius: 12px; padding: 20px; margin-bottom: 25px; text-align: center; border: 1px solid #334155; }
         .box-resumo h4 { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 5px; text-transform: uppercase; }
         .box-resumo .valor-destaque { font-size: 2.2rem; color: var(--green); font-weight: 900; text-shadow: 0 0 15px var(--green-glow); }
         .box-resumo p { color: var(--text-muted); font-size: 0.9rem; }
-
         .box-pix { background-color: rgba(251, 191, 36, 0.05); border: 1px dashed var(--gold); border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 25px; }
         .box-pix p.titulo-pix { font-size: 1rem; color: var(--gold); margin-bottom: 15px; font-weight: 700; }
         .chave-pix { font-family: monospace; font-size: 1.1rem; background: var(--bg-deep); color: var(--text-light); padding: 15px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 15px; word-break: break-all; }
         .btn-copiar { background-color: var(--gold); color: var(--bg-deep); border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 800; font-size: 0.95rem; transition: all 0.2s; }
         .btn-copiar:hover { background-color: var(--gold-hover); box-shadow: 0 5px 15px rgba(251, 191, 36, 0.3); }
-
         .passo { display: none; }
         .passo.ativo { display: block; }
         .btn-voltar-passo { background: none; border: none; color: var(--text-muted); text-decoration: underline; cursor: pointer; margin-top: 20px; width: 100%; text-align: center; font-size: 0.9rem; }
         .btn-voltar-passo:hover { color: var(--text-light); }
-
-        @media (min-width: 768px) {
-            .barra-inferior { left: 50%; transform: translateX(-50%); max-width: 800px; border-radius: 20px 20px 0 0; border-left: var(--border-light-thin); border-right: var(--border-light-thin); }
-        }
+        @media (min-width: 768px) { .barra-inferior { left: 50%; transform: translateX(-50%); max-width: 800px; border-radius: 20px 20px 0 0; border-left: var(--border-light-thin); border-right: var(--border-light-thin); } }
     </style>
 </head>
 <body>
@@ -160,6 +121,23 @@
     <main>
         <div class="container-banner">
             <img src="banner.png" alt="Banner da Rifa" class="imagem-banner">
+        </div>
+
+        <div class="painel-marketing">
+            
+            <div class="banner-cota" id="boxCota">
+                ⚡ TEM COTA PREMIADA ESCONDIDA! Compre e ganhe na hora! ⚡
+            </div>
+
+            <div class="ganhador-cota" id="boxGanhadores"></div>
+
+            <div class="barra-progresso-container" id="boxProgresso">
+                <div class="barra-texto">🔥 <span id="porcentagemTexto">50</span>% dos números vendidos! Corre!</div>
+                <div class="barra-fundo">
+                    <div class="barra-preenchimento" id="barraPreenchimento"></div>
+                </div>
+            </div>
+
         </div>
 
         <div class="legenda">
@@ -227,10 +205,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // =========================================
-            // CONFIGURAÇÕES ATUALIZADAS
-            // =========================================
-            const CHAVE_PIX = "a6051516-356a-440b-9b57-06a5aca44ce3"; // Sua nova chave aleatória
+            const CHAVE_PIX = "a6051516-356a-440b-9b57-06a5aca44ce3"; 
             const TELEFONE_WHATSAPP = "5588999465376"; 
             const VALOR_POR_PONTO = 3;
             
@@ -277,14 +252,20 @@
 
             async function carregarStatusDoBanco() {
                 try {
+                    // Puxa também os dados de premiação agora
                     const { data, error } = await supabaseClient.from('numeros').select('*');
                     if (error) throw error;
 
                     if (data) {
+                        let qtdVendidosEReservados = 0;
+                        let temCotaLivre = false;
+                        let listaGanhadores = [];
+
                         data.forEach(registro => {
                             const numStr = String(registro.numero).padStart(3, '0');
                             const botao = document.getElementById(`btn-numero-${numStr}`);
 
+                            // Lógica de Cores dos Botões
                             if (botao) {
                                 if (registro.status === 'pago' || registro.status === 'vendido') {
                                     botao.className = 'numero pago';
@@ -292,7 +273,46 @@
                                     botao.className = 'numero reservado';
                                 }
                             }
+
+                            // Lógica do Marketing Automático
+                            if (registro.status !== 'livre') {
+                                qtdVendidosEReservados++;
+                            }
+
+                            if (registro.is_premiado) {
+                                if (registro.status === 'livre') {
+                                    temCotaLivre = true;
+                                } else if (registro.status === 'pago' || registro.status === 'vendido') {
+                                    // Pega só o primeiro nome do cliente para não expor muito
+                                    const primeiroNome = registro.nome_cliente ? registro.nome_cliente.split(' ')[0] : 'Alguém';
+                                    listaGanhadores.push(`🏆 <strong>${primeiroNome}</strong> achou a cota ${registro.numero} e ganhou ${registro.valor_premio}!`);
+                                }
+                            }
                         });
+
+                        // 1. Exibe o Mural de Ganhadores se alguém já pagou uma cota premiada
+                        if (listaGanhadores.length > 0) {
+                            const boxGanhadores = document.getElementById('boxGanhadores');
+                            boxGanhadores.style.display = 'block';
+                            boxGanhadores.innerHTML = listaGanhadores.join('<br>');
+                        }
+
+                        // 2. Exibe o Banner de Aviso se ainda tiver prêmio livre
+                        if (temCotaLivre) {
+                            document.getElementById('boxCota').style.display = 'block';
+                        }
+
+                        // 3. Lógica da Barra de 50% (Baseado em 200 números)
+                        const porcentagemVendida = (qtdVendidosEReservados / 200) * 100;
+                        if (porcentagemVendida >= 50) {
+                            document.getElementById('boxProgresso').style.display = 'block';
+                            document.getElementById('porcentagemTexto').innerText = Math.floor(porcentagemVendida);
+                            
+                            // Anima a barra enchendo suavemente
+                            setTimeout(() => {
+                                document.getElementById('barraPreenchimento').style.width = `${porcentagemVendida}%`;
+                            }, 500);
+                        }
                     }
                 } catch (err) {
                     console.error('Falha de conexão:', err);
@@ -381,12 +401,12 @@
 
                     if (error) throw error;
 
-                    const mensagem = `✅ *PAGAMENTO REALIZADO*\n\n` +
-                                     `Olá! Fiz o pagamento da rifa.\n` +
+                    const mensagem = `✅ *RESERVA REALIZADA*\n\n` +
+                                     `Olá! Fiz a reserva na Rifa Imperdível.\n` +
                                      `*Nome:* ${nome}\n` +
-                                     `*Números escolhidos:* ${numerosEscolhidos.join(', ')}\n` +
+                                     `*Números:* ${numerosEscolhidos.join(', ')}\n` +
                                      `*Total:* R$ ${total},00\n\n` +
-                                     `Segue o meu comprovante abaixo! 🧾`;
+                                     `Segue o meu comprovante do PIX abaixo! 🧾`;
                     
                     const mensagemCodificada = encodeURIComponent(mensagem);
                     window.open(`https://wa.me/${TELEFONE_WHATSAPP}?text=${mensagemCodificada}`, '_blank');

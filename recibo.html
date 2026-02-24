@@ -8,107 +8,57 @@
     <link rel="icon" type="image/png" href="favicon.png">
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --bg-main: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-deep: #020617;
-            --gold: #fbbf24;
-            --gold-light: #fef08a;
-            --gold-dark: #b45309;
-            --green: #10b981;
-            --green-glow: rgba(16, 185, 129, 0.4);
-            --red: #ef4444;
-            --text-light: #f8fafc;
-            --text-muted: #94a3b8;
+            --bg-main: #0f172a; --bg-secondary: #1e293b; --bg-deep: #020617;
+            --gold: #fbbf24; --gold-light: #fef08a; --gold-dark: #b45309;
+            --green: #10b981; --green-glow: rgba(16, 185, 129, 0.4);
+            --red: #ef4444; --text-light: #f8fafc; --text-muted: #94a3b8;
             --border-light-thin: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { 
-            background: radial-gradient(circle at top center, var(--bg-secondary), var(--bg-deep)); 
-            color: var(--text-light); 
-            display: flex; justify-content: center; align-items: center; 
-            min-height: 100vh; padding: 20px; 
-            overflow-x: hidden;
-        }
+        body { background: radial-gradient(circle at top center, var(--bg-secondary), var(--bg-deep)); color: var(--text-light); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; overflow-x: hidden; }
 
-        /* Efeito de luz de fundo */
-        .glow-bg {
-            position: absolute; width: 300px; height: 300px;
-            background: rgba(251, 191, 36, 0.15); filter: blur(100px);
-            border-radius: 50%; z-index: 0; pointer-events: none;
-        }
+        .glow-bg { position: absolute; width: 300px; height: 300px; background: rgba(251, 191, 36, 0.15); filter: blur(100px); border-radius: 50%; z-index: 0; pointer-events: none; }
 
-        /* O Cartão Dourado (Golden Ticket) */
-        .recibo-cartao {
-            position: relative; z-index: 1;
-            background: linear-gradient(145deg, var(--bg-secondary), var(--bg-deep));
-            width: 100%; max-width: 420px; border-radius: 24px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(251, 191, 36, 0.2);
-            padding: 40px 30px; text-align: center; animation: surgir 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            overflow: hidden;
-        }
-
-        /* Borda brilhante animada */
-        .recibo-cartao::before {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: conic-gradient(from 0deg, transparent 0%, rgba(251, 191, 36, 0.1) 25%, transparent 50%, rgba(251, 191, 36, 0.1) 75%, transparent 100%);
-            animation: girar-borda 8s linear infinite; z-index: -1; pointer-events: none;
-        }
+        .recibo-cartao { position: relative; z-index: 1; background: linear-gradient(145deg, var(--bg-secondary), var(--bg-deep)); width: 100%; max-width: 420px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(251, 191, 36, 0.2); padding: 40px 30px; text-align: center; animation: surgir 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); overflow: hidden; }
+        .recibo-cartao::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: conic-gradient(from 0deg, transparent 0%, rgba(251, 191, 36, 0.1) 25%, transparent 50%, rgba(251, 191, 36, 0.1) 75%, transparent 100%); animation: girar-borda 8s linear infinite; z-index: -1; pointer-events: none; }
 
         @keyframes girar-borda { 100% { transform: rotate(360deg); } }
         @keyframes surgir { from { opacity: 0; transform: scale(0.9) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
 
-        .selo-vip {
-            background: linear-gradient(135deg, var(--gold-light), var(--gold), var(--gold-dark));
-            color: var(--bg-deep); font-size: 0.8rem; font-weight: 900; letter-spacing: 2px;
-            padding: 5px 15px; border-radius: 20px; display: inline-block; margin-bottom: 20px;
-            box-shadow: 0 4px 10px rgba(251, 191, 36, 0.3); text-transform: uppercase;
-        }
+        .selo-vip { background: linear-gradient(135deg, var(--gold-light), var(--gold), var(--gold-dark)); color: var(--bg-deep); font-size: 0.8rem; font-weight: 900; letter-spacing: 2px; padding: 5px 15px; border-radius: 20px; display: inline-block; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(251, 191, 36, 0.3); text-transform: uppercase; }
 
-        .icone-sucesso {
-            width: 70px; height: 70px; margin: 0 auto 20px auto;
-            background-color: rgba(16, 185, 129, 0.1); color: var(--green);
-            border: 2px solid var(--green); border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            font-size: 2rem; box-shadow: 0 0 20px var(--green-glow);
-        }
-
+        .icone-sucesso { width: 70px; height: 70px; margin: 0 auto 20px auto; background-color: rgba(16, 185, 129, 0.1); color: var(--green); border: 2px solid var(--green); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2rem; box-shadow: 0 0 20px var(--green-glow); transition: 0.5s; }
+        
+        /* ESTILO PARA QUANDO ACHAR A COTA */
+        .icone-premiado { background-color: rgba(251, 191, 36, 0.2); color: var(--gold); border-color: var(--gold); box-shadow: 0 0 30px rgba(251, 191, 36, 0.6); animation: pulsa-trofeu 1.5s infinite; }
+        @keyframes pulsa-trofeu { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        
         h1 { color: var(--text-light); font-size: 1.6rem; font-weight: 800; margin-bottom: 10px; }
         p.mensagem { color: var(--text-muted); font-size: 1rem; margin-bottom: 30px; line-height: 1.6; }
         p.mensagem strong { color: var(--gold); font-size: 1.1rem; }
 
-        .box-numeros {
-            background-color: rgba(2, 6, 23, 0.6); border: 1px solid rgba(251, 191, 36, 0.2);
-            border-radius: 16px; padding: 25px 20px; margin-bottom: 30px; position: relative;
-        }
-        
-        .box-numeros h3 { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; font-weight: 600; }
+        .box-premio { display: none; background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(180, 83, 9, 0.2)); border: 1px dashed var(--gold); border-radius: 12px; padding: 15px; margin-bottom: 25px; animation: surgir 1s ease-out; }
+        .box-premio h4 { color: var(--gold); text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; margin-bottom: 5px; }
+        .box-premio p { color: var(--text-light); font-weight: bold; font-size: 1.1rem; }
 
+        .box-numeros { background-color: rgba(2, 6, 23, 0.6); border: 1px solid rgba(251, 191, 36, 0.2); border-radius: 16px; padding: 25px 20px; margin-bottom: 30px; position: relative; }
+        .box-numeros h3 { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; font-weight: 600; }
         .grid-numeros-cliente { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
         
-        .numero-tag {
-            background: linear-gradient(145deg, var(--bg-secondary), var(--bg-deep));
-            color: var(--gold); font-size: 1.3rem; font-weight: 900;
-            width: 55px; height: 55px; display: flex; align-items: center; justify-content: center;
-            border-radius: 12px; border: 1px solid rgba(251, 191, 36, 0.4);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3), inset 0 2px 0 rgba(255,255,255,0.05);
-        }
+        .numero-tag { background: linear-gradient(145deg, var(--bg-secondary), var(--bg-deep)); color: var(--text-muted); font-size: 1.3rem; font-weight: 900; width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .numero-tag.premiado { background: var(--gold); color: #000; border: 1px solid var(--gold-light); box-shadow: 0 0 15px rgba(251, 191, 36, 0.8); animation: pulsa-trofeu 2s infinite; }
 
         .detalhe-rodape { font-size: 0.75rem; color: #475569; margin-bottom: 25px; font-family: monospace; letter-spacing: 1px; }
 
-        .btn-voltar {
-            display: inline-block; width: 100%;
-            background: linear-gradient(135deg, var(--gold), var(--gold-dark)); color: var(--bg-deep);
-            text-decoration: none; padding: 16px 30px; border-radius: 30px; font-weight: 900;
-            font-size: 0.95rem; transition: all 0.3s; text-transform: uppercase; letter-spacing: 1px;
-            box-shadow: 0 10px 20px rgba(251, 191, 36, 0.2); border: none;
-        }
+        .btn-voltar { display: inline-block; width: 100%; background: linear-gradient(135deg, var(--gold), var(--gold-dark)); color: var(--bg-deep); text-decoration: none; padding: 16px 30px; border-radius: 30px; font-weight: 900; font-size: 0.95rem; transition: all 0.3s; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 20px rgba(251, 191, 36, 0.2); border: none; }
         .btn-voltar:hover { transform: translateY(-2px); box-shadow: 0 15px 25px rgba(251, 191, 36, 0.4); filter: brightness(1.1); }
-
         .escondido { display: none !important; }
         .erro { color: var(--red) !important; text-shadow: none; }
     </style>
@@ -118,23 +68,27 @@
     <div class="glow-bg"></div>
 
     <div class="recibo-cartao">
-        
         <div id="estadoCarregando">
             <h2 style="color: var(--gold); margin-bottom: 15px; font-size: 1.2rem;">Validando Recibo...</h2>
             <p class="mensagem">Verificando autenticidade no sistema.</p>
         </div>
 
         <div id="estadoSucesso" class="escondido">
-            <div class="selo-vip">RECIBO OFICIAL</div>
+            <div class="selo-vip" id="tagSelo">RECIBO OFICIAL</div>
             
-            <div class="icone-sucesso">✓</div>
-            <h1>Pagamento Aprovado</h1>
+            <div class="icone-sucesso" id="iconeTopo">✓</div>
+            <h1 id="tituloRecibo">Pagamento Aprovado</h1>
             <p class="mensagem" id="textoBoasVindas">Boa sorte, <strong>Cliente</strong>! Sua participação está confirmada e registrada.</p>
             
+            <div class="box-premio" id="boxPremio">
+                <h4>🎉 COTA ENCONTRADA 🎉</h4>
+                <p id="textoPremioEncontrado">Você ganhou R$ 0,00</p>
+                <span style="font-size: 0.8rem; color: rgba(255,255,255,0.7); display:block; margin-top:5px;">Chame o admin no WhatsApp para receber o PIX na hora!</span>
+            </div>
+
             <div class="box-numeros">
-                <h3>Seus Números da Sorte</h3>
-                <div class="grid-numeros-cliente" id="containerNumeros">
-                    </div>
+                <h3>Seus Números</h3>
+                <div class="grid-numeros-cliente" id="containerNumeros"></div>
             </div>
             
             <div class="detalhe-rodape" id="codigoTransacao">ID: AUTH-00000000</div>
@@ -148,7 +102,6 @@
             <p class="mensagem">O link acessado é inválido ou o pagamento ainda não foi processado pelo administrador.</p>
             <a href="index.html" class="btn-voltar" style="background: transparent; border: 1px solid var(--text-muted); color: var(--text-light); box-shadow: none;">Voltar para a Rifa</a>
         </div>
-
     </div>
 
     <script>
@@ -163,73 +116,83 @@
             const textoBoasVindas = document.getElementById('textoBoasVindas');
             const containerNumeros = document.getElementById('containerNumeros');
             const codigoTransacao = document.getElementById('codigoTransacao');
+            
+            // Elementos da Surpresa
+            const iconeTopo = document.getElementById('iconeTopo');
+            const tituloRecibo = document.getElementById('tituloRecibo');
+            const boxPremio = document.getElementById('boxPremio');
+            const textoPremioEncontrado = document.getElementById('textoPremioEncontrado');
 
-            // 1. Pega o parâmetro ID (camuflado) da URL
             const parametrosDaUrl = new URLSearchParams(window.location.search);
             const idCamuflado = parametrosDaUrl.get('id');
 
-            if (!idCamuflado) {
-                mostrarErro();
-                return;
-            }
+            if (!idCamuflado) { mostrarErro(); return; }
 
             let telefoneDoCliente;
-            try {
-                // 2. Descamufla (decodifica) o ID para recuperar o telefone real
-                telefoneDoCliente = atob(idCamuflado);
-            } catch (e) {
-                // Se alguém tentar digitar um ID falso que não seja Base64
-                mostrarErro();
-                return;
-            }
+            try { telefoneDoCliente = atob(idCamuflado); } 
+            catch (e) { mostrarErro(); return; }
 
             try {
-                // 3. Busca no banco usando o telefone descamuflado
                 const { data, error } = await supabaseClient
                     .from('numeros')
-                    .select('*')
+                    .select('numero, status, nome_cliente, is_premiado, valor_premio')
                     .eq('telefone_cliente', telefoneDoCliente);
 
                 if (error) throw error;
 
-                // 4. Verifica se tem algum número aprovado
                 const numerosConfirmados = data.filter(item => item.status === 'pago' || item.status === 'vendido');
 
                 if (numerosConfirmados.length > 0) {
                     const nome = numerosConfirmados[0].nome_cliente;
-                    const numeros = numerosConfirmados.map(item => item.numero).sort();
-
-                    // Preenche os dados
-                    textoBoasVindas.innerHTML = `Sorteio autorizado para<br><strong style="font-size: 1.2rem;">${nome}</strong>`;
                     
-                    // Gera um código de transação falso decorativo usando a data
-                    const dataHoje = new Date();
-                    const codigoFalso = Math.random().toString(36).substring(2, 8).toUpperCase();
+                    // Verifica se TEM ALGUMA COTA PREMIADA na compra
+                    let achouPremio = false;
+                    let premioDescricao = [];
+
+                    numerosConfirmados.forEach(item => {
+                        if(item.is_premiado) {
+                            achouPremio = true;
+                            premioDescricao.push(`${item.numero} (${item.valor_premio})`);
+                        }
+                    });
+
+                    // Modifica o visual se for premiado
+                    if(achouPremio) {
+                        iconeTopo.innerHTML = '🏆';
+                        iconeTopo.classList.add('icone-premiado');
+                        tituloRecibo.innerHTML = 'COTA PREMIADA!';
+                        tituloRecibo.style.color = 'var(--gold)';
+                        textoBoasVindas.innerHTML = `Parabéns, <strong style="font-size: 1.2rem;">${nome}</strong>! Você tirou a sorte grande hoje.`;
+                        
+                        boxPremio.style.display = 'block';
+                        textoPremioEncontrado.innerText = `Cotas: ${premioDescricao.join(' e ')}`;
+
+                        // DISPARA A EXPLOSÃO DE CONFETES!!! 🎉🎉🎉
+                        setTimeout(() => {
+                            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#fbbf24', '#f59e0b', '#ffffff', '#10b981'] });
+                        }, 500);
+                        setTimeout(() => {
+                            confetti({ particleCount: 100, spread: 100, origin: { y: 0.6 }, colors: ['#fbbf24', '#f59e0b'] });
+                        }, 1200);
+                    } else {
+                        textoBoasVindas.innerHTML = `Sorteio autorizado para<br><strong style="font-size: 1.2rem;">${nome}</strong>`;
+                    }
+                    
+                    const dataHoje = new Date(); const codigoFalso = Math.random().toString(36).substring(2, 8).toUpperCase();
                     codigoTransacao.innerText = `AUTH-${dataHoje.getFullYear()}${dataHoje.getMonth()+1}${dataHoje.getDate()}-${codigoFalso}`;
 
-                    numeros.forEach(num => {
+                    // Renderiza as bolinhas com destaque pro número dourado
+                    numerosConfirmados.sort((a,b) => a.numero - b.numero).forEach(item => {
                         const span = document.createElement('span');
-                        span.className = 'numero-tag';
-                        span.innerText = num;
+                        span.className = `numero-tag ${item.is_premiado ? 'premiado' : ''}`;
+                        span.innerText = item.numero;
                         containerNumeros.appendChild(span);
                     });
 
-                    // Mostra o sucesso
-                    telaCarregamento.classList.add('escondido');
-                    telaSucesso.classList.remove('escondido');
-                } else {
-                    mostrarErro();
-                }
-
-            } catch (err) {
-                console.error("Erro ao buscar recibo:", err);
-                mostrarErro();
-            }
-
-            function mostrarErro() {
-                telaCarregamento.classList.add('escondido');
-                telaErro.classList.remove('escondido');
-            }
+                    telaCarregamento.classList.add('escondido'); telaSucesso.classList.remove('escondido');
+                } else { mostrarErro(); }
+            } catch (err) { console.error("Erro", err); mostrarErro(); }
+            function mostrarErro() { telaCarregamento.classList.add('escondido'); telaErro.classList.remove('escondido'); }
         });
     </script>
 </body>
