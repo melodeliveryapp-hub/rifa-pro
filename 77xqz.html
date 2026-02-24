@@ -209,14 +209,10 @@
             function mostrarErro(mensagem) { msgErroLogin.innerText = mensagem; msgErroLogin.style.display = 'block'; }
             function mostrarDashboard() { telaLogin.style.display = 'none'; telaDashboard.style.display = 'block'; document.title = "Dashboard - Rifa PRO"; carregarDados(); }
 
-            // ==========================================
-            // LÓGICA DO OLHINHO (ESCONDER SALDO GERAL APENAS)
-            // ==========================================
             btnOlho.addEventListener('click', () => {
                 ocultarValores = !ocultarValores;
                 btnOlho.innerText = ocultarValores ? '🙈' : '👁️';
                 atualizarVisaoReceita();
-                // ATUALIZADO: Removemos o renderizarCartoes daqui, assim o valor do cliente não some!
             });
 
             function atualizarVisaoReceita() {
@@ -229,7 +225,6 @@
 
             async function carregarDados() {
                 loader.style.display = 'block'; listaReservas.innerHTML = '';
-                // ATUALIZADO: Puxando a nova coluna hora_compra
                 const { data, error } = await supabaseClient.from('numeros').select('numero, status, nome_cliente, telefone_cliente, is_premiado, valor_premio, id_pedido, data_compra, hora_compra').neq('status', 'livre');
                 if (error) { console.error("Erro", error); loader.innerText = "Erro ao carregar."; return; }
                 calcularMetricas(data); agruparEProcessar(data); aplicarFiltrosEPesquisa();
@@ -259,7 +254,7 @@
                             nome: item.nome_cliente || 'Sem Nome', 
                             telefone: item.telefone_cliente || '', 
                             dataCompra: item.data_compra || '', 
-                            horaCompra: item.hora_compra || '', // Guardando a hora
+                            horaCompra: item.hora_compra || '',
                             status: statusCorrigido, 
                             numeros: [], 
                             temPremio: false, 
@@ -319,7 +314,6 @@
                     let dataFormatada = '';
                     if (cliente.dataCompra) { 
                         const partes = cliente.dataCompra.split('-'); 
-                        // ATUALIZADO: Mostrando a Hora da Compra junto com a Data
                         dataFormatada = `📅 ${partes[2]}/${partes[1]}/${partes[0]} às ${cliente.horaCompra || '12:00'}`; 
                     }
 
@@ -328,7 +322,6 @@
 
                     const div = document.createElement('div'); div.className = `cartao-reserva ${isPago ? 'pago' : ''} ${classeVip}`;
                     
-                    // ATUALIZADO: O valor do cartão sempre aparece R$ ${totalR$},00
                     div.innerHTML = `
                         ${htmlFaixaPremio}
                         <div class="cartao-header">
@@ -369,9 +362,12 @@
                 const numeros = numerosStr.split(','); await supabaseClient.from('numeros').update({ status: 'livre', nome_cliente: null, telefone_cliente: null, id_pedido: null, data_compra: null, hora_compra: null }).in('numero', numeros); carregarDados();
             };
 
+            // A FUNÇÃO CORRIGIDA ESTÁ AQUI ABAIXO:
             window.gerarLinkRecibo = function(idPedido, telefone, temPremio) {
                 const urlBase = window.location.href.substring(0, window.location.href.lastIndexOf('/')) + '/';
-                const idCamuflado = btoa(idPedido); const linkRecibo = `${urlBase}recibo.html?id=${idCamCamuflado}`;
+                const idCamuflado = btoa(idPedido); 
+                const linkRecibo = `${urlBase}recibo.html?id=${idCamuflado}`;
+                
                 let mensagem = '';
                 if(temPremio) {
                     mensagem = `🏆 *SURPRESA! VOCÊ ACHOU A COTA PREMIADA!*\n\n` +
@@ -387,7 +383,9 @@
                                `🔗 ${linkRecibo}\n\n` +
                                `Boa sorte! 🍀`;
                 }
-                const telefoneLimpo = "55" + telefone.replace(/\D/g, ''); const linkWhatsapp = `https://wa.me/${telefoneLimpo}?text=${encodeURIComponent(mensagem)}`;
+                const telefoneLimpo = "55" + telefone.replace(/\D/g, ''); 
+                const linkWhatsapp = `https://wa.me/${telefoneLimpo}?text=${encodeURIComponent(mensagem)}`;
+                
                 navigator.clipboard.writeText(mensagem).then(() => { window.open(linkWhatsapp, '_blank'); });
             };
 
