@@ -210,13 +210,13 @@
             function mostrarDashboard() { telaLogin.style.display = 'none'; telaDashboard.style.display = 'block'; document.title = "Dashboard - Rifa PRO"; carregarDados(); }
 
             // ==========================================
-            // LÓGICA DO OLHINHO (ESCONDER SALDO)
+            // LÓGICA DO OLHINHO (ESCONDER SALDO GERAL APENAS)
             // ==========================================
             btnOlho.addEventListener('click', () => {
                 ocultarValores = !ocultarValores;
                 btnOlho.innerText = ocultarValores ? '🙈' : '👁️';
                 atualizarVisaoReceita();
-                renderizarCartoes(dadosAgrupados.filter(aplicarRegrasDeFiltro)); // Atualiza os cards também
+                // ATUALIZADO: Removemos o renderizarCartoes daqui, assim o valor do cliente não some!
             });
 
             function atualizarVisaoReceita() {
@@ -229,8 +229,8 @@
 
             async function carregarDados() {
                 loader.style.display = 'block'; listaReservas.innerHTML = '';
-                // Puxando também a coluna data_compra
-                const { data, error } = await supabaseClient.from('numeros').select('numero, status, nome_cliente, telefone_cliente, is_premiado, valor_premio, id_pedido, data_compra').neq('status', 'livre');
+                // ATUALIZADO: Puxando a nova coluna hora_compra
+                const { data, error } = await supabaseClient.from('numeros').select('numero, status, nome_cliente, telefone_cliente, is_premiado, valor_premio, id_pedido, data_compra, hora_compra').neq('status', 'livre');
                 if (error) { console.error("Erro", error); loader.innerText = "Erro ao carregar."; return; }
                 calcularMetricas(data); agruparEProcessar(data); aplicarFiltrosEPesquisa();
                 loader.style.display = 'none';
@@ -258,7 +258,8 @@
                             idPedido: chave,
                             nome: item.nome_cliente || 'Sem Nome', 
                             telefone: item.telefone_cliente || '', 
-                            dataCompra: item.data_compra || '', // Guardando a data
+                            dataCompra: item.data_compra || '', 
+                            horaCompra: item.hora_compra || '', // Guardando a hora
                             status: statusCorrigido, 
                             numeros: [], 
                             temPremio: false, 
@@ -271,23 +272,17 @@
                 dadosAgrupados = Object.values(mapa);
             }
 
-            // ==========================================
-            // LÓGICA DOS FILTROS (MÚLTIPLA ESCOLHA)
-            // ==========================================
             function aplicarRegrasDeFiltro(cliente) {
                 const termo = pesquisaInput.value.toLowerCase();
                 const dataSelecionada = filtroData.value;
                 
-                // 1. Pesquisa de Texto (Busca nome, telefone, pedido e também verifica se o NÚMERO exato está no carrinho)
                 const passaTexto = cliente.nome.toLowerCase().includes(termo) || 
                                    cliente.telefone.includes(termo) || 
                                    cliente.idPedido.toLowerCase().includes(termo) ||
                                    cliente.numeros.some(n => String(n.num).padStart(3, '0').includes(termo) || String(n.num).includes(termo));
                 
-                // 2. Filtro de Status (Todos, Pagos, Pendentes)
                 const passaStatus = (filtroAtual === 'todos') || (cliente.status === filtroAtual);
                 
-                // 3. Filtro de Data do Calendário
                 let passaData = true;
                 if (dataSelecionada) {
                     passaData = (cliente.dataCompra === dataSelecionada);
@@ -322,13 +317,18 @@
                     const totalR$ = cliente.numeros.length * VALOR_POR_PONTO;
                     
                     let dataFormatada = '';
-                    if (cliente.dataCompra) { const partes = cliente.dataCompra.split('-'); dataFormatada = `📅 ${partes[2]}/${partes[1]}/${partes[0]}`; }
+                    if (cliente.dataCompra) { 
+                        const partes = cliente.dataCompra.split('-'); 
+                        // ATUALIZADO: Mostrando a Hora da Compra junto com a Data
+                        dataFormatada = `📅 ${partes[2]}/${partes[1]}/${partes[0]} às ${cliente.horaCompra || '12:00'}`; 
+                    }
 
                     const classeVip = cliente.temPremio ? 'vip-premiado' : '';
                     let htmlFaixaPremio = ''; if (cliente.temPremio) { htmlFaixaPremio = `<div class="faixa-premiada">🏆 ${cliente.detalhesPremio.join(' | ')}</div>`; }
 
                     const div = document.createElement('div'); div.className = `cartao-reserva ${isPago ? 'pago' : ''} ${classeVip}`;
                     
+                    // ATUALIZADO: O valor do cartão sempre aparece R$ ${totalR$},00
                     div.innerHTML = `
                         ${htmlFaixaPremio}
                         <div class="cartao-header">
@@ -342,7 +342,7 @@
                                 <span style="font-size: 0.7rem; color: var(--text-muted);">${dataFormatada}</span>
                             </div>
                         </div>
-                        <div class="info-valores"><p>Quantidade: <strong style="color: var(--text-light);">${cliente.numeros.length} números</strong></p><p>Total: <span class="valor-destaque">${ocultarValores ? 'R$ ****' : `R$ ${totalR$},00`}</span></p></div>
+                        <div class="info-valores"><p>Quantidade: <strong style="color: var(--text-light);">${cliente.numeros.length} números</strong></p><p>Total: <span class="valor-destaque">R$ ${totalR$},00</span></p></div>
                         
                         <div class="numeros-lista">
                             ${cliente.numeros.map(obj => `<span class="numero-tag ${isPago ? 'pago' : ''} ${obj.premiado ? 'tag-premiada' : ''}">${obj.num}</span>`).join('')}
@@ -366,12 +366,12 @@
             window.cancelar = async function(telefone, numerosStr, isPago) {
                 if (isPago) { if(!confirm('🚨 ALERTA: Este pedido já estava PAGO. Deseja cancelar a compra e liberar os números?')) return; } 
                 else { if(!confirm('Deseja excluir este pedido e devolver os números para a tela inicial?')) return; }
-                const numeros = numerosStr.split(','); await supabaseClient.from('numeros').update({ status: 'livre', nome_cliente: null, telefone_cliente: null, id_pedido: null, data_compra: null }).in('numero', numeros); carregarDados();
+                const numeros = numerosStr.split(','); await supabaseClient.from('numeros').update({ status: 'livre', nome_cliente: null, telefone_cliente: null, id_pedido: null, data_compra: null, hora_compra: null }).in('numero', numeros); carregarDados();
             };
 
             window.gerarLinkRecibo = function(idPedido, telefone, temPremio) {
                 const urlBase = window.location.href.substring(0, window.location.href.lastIndexOf('/')) + '/';
-                const idCamuflado = btoa(idPedido); const linkRecibo = `${urlBase}recibo.html?id=${idCamuflado}`;
+                const idCamuflado = btoa(idPedido); const linkRecibo = `${urlBase}recibo.html?id=${idCamCamuflado}`;
                 let mensagem = '';
                 if(temPremio) {
                     mensagem = `🏆 *SURPRESA! VOCÊ ACHOU A COTA PREMIADA!*\n\n` +
