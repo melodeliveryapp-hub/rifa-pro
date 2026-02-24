@@ -48,31 +48,41 @@
         .metrica-card { background-color: var(--bg-secondary); padding: 20px; border-radius: var(--borda-raio); border: var(--border-light-thin); box-shadow: var(--sombra-card); border-bottom: 4px solid var(--gold); display: flex; flex-direction: column; }
         .metrica-card.sucesso { border-bottom-color: var(--green); }
         .metrica-card.alerta { border-bottom-color: #f97316; }
-        .metrica-titulo { font-size: 0.9rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 5px; }
+        .metrica-titulo { font-size: 0.9rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center; }
         .metrica-valor { font-size: 2rem; font-weight: 900; color: var(--text-light); }
+        .btn-olho { background: none; border: none; font-size: 1.2rem; cursor: pointer; opacity: 0.7; transition: 0.2s; }
+        .btn-olho:hover { opacity: 1; transform: scale(1.1); }
 
         .controles-container { background-color: var(--bg-secondary); border: var(--border-light-thin); padding: 20px; border-radius: var(--borda-raio); box-shadow: var(--sombra-card); margin-bottom: 25px; display: flex; flex-direction: column; gap: 15px; }
-        .barra-pesquisa { width: 100%; padding: 14px; background-color: var(--bg-deep); border: 1px solid #334155; border-radius: 8px; font-size: 1rem; color: var(--text-light); outline: none; transition: border-color 0.2s; }
-        .barra-pesquisa:focus { border-color: var(--gold); }
+        .grupo-pesquisa { display: flex; gap: 10px; flex-wrap: wrap; }
+        .barra-pesquisa { flex: 1; min-width: 250px; padding: 14px; background-color: var(--bg-deep); border: 1px solid #334155; border-radius: 8px; font-size: 1rem; color: var(--text-light); outline: none; transition: border-color 0.2s; }
+        .filtro-data { width: auto; padding: 14px; background-color: var(--bg-deep); border: 1px solid #334155; border-radius: 8px; font-size: 1rem; color: var(--text-light); outline: none; cursor: pointer; color-scheme: dark; }
+        .barra-pesquisa:focus, .filtro-data:focus { border-color: var(--gold); }
         .filtros-botoes { display: flex; gap: 10px; flex-wrap: wrap; }
         .btn-filtro { padding: 8px 16px; border: 1px solid #334155; background: var(--bg-deep); border-radius: 20px; font-weight: 600; cursor: pointer; color: var(--text-muted); transition: all 0.2s; }
         .btn-filtro.ativo { background-color: rgba(251, 191, 36, 0.1); color: var(--gold); border-color: var(--gold); }
 
         .container-reservas { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; width: 100%; }
-        .cartao-reserva { background-color: var(--bg-secondary); padding: 20px; border-radius: var(--borda-raio); border: var(--border-light-thin); box-shadow: var(--sombra-card); border-top: 5px solid #f97316; display: flex; flex-direction: column; transition: transform 0.2s; }
+        .cartao-reserva { background-color: var(--bg-secondary); padding: 20px; border-radius: var(--borda-raio); border: var(--border-light-thin); box-shadow: var(--sombra-card); border-top: 5px solid #f97316; display: flex; flex-direction: column; transition: transform 0.2s; position: relative; overflow: hidden;}
         .cartao-reserva.pago { border-top-color: var(--green); }
-        .cartao-reserva:hover { transform: translateY(-3px); }
+        .cartao-reserva.vip-premiado { border: 2px solid var(--gold); border-top: 5px solid var(--gold); background: linear-gradient(145deg, var(--bg-secondary), rgba(251, 191, 36, 0.05)); box-shadow: 0 0 20px rgba(251, 191, 36, 0.2); }
+        .faixa-premiada { background-color: var(--gold); color: #000; font-size: 0.8rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; padding: 5px 10px; display: inline-block; border-radius: 5px; margin-bottom: 10px; animation: piscar 2s infinite; }
+        @keyframes piscar { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
+
         .cartao-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
         .nome-cliente { font-size: 1.3rem; font-weight: 800; color: var(--text-light); margin-bottom: 3px; }
         .telefone-cliente { font-size: 0.9rem; color: var(--text-muted); font-weight: 500; }
         .status-badge { background-color: rgba(249, 115, 22, 0.1); color: #fdba74; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid rgba(249, 115, 22, 0.3); }
         .status-badge.pago { background-color: rgba(16, 185, 129, 0.1); color: var(--green); border-color: rgba(16, 185, 129, 0.3); }
+        
         .info-valores { background-color: var(--bg-deep); padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #334155; }
         .info-valores p { font-size: 0.95rem; margin-bottom: 4px; color: var(--text-muted); }
         .valor-destaque { font-weight: 800; color: var(--gold); font-size: 1.1rem; }
+        
         .numeros-lista { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
         .numero-tag { background-color: var(--bg-main); color: var(--text-muted); border: 1px solid #334155; padding: 4px 8px; border-radius: 6px; font-weight: bold; font-size: 0.85rem; }
         .numero-tag.pago { background-color: rgba(16, 185, 129, 0.1); color: var(--green); border-color: rgba(16, 185, 129, 0.3); }
+        .numero-tag.tag-premiada { background-color: var(--gold); color: #000; border-color: var(--gold); box-shadow: 0 0 10px rgba(251, 191, 36, 0.5); }
 
         .botoes-acao { display: flex; flex-wrap: wrap; gap: 10px; margin-top: auto; }
         .btn-acao { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; color: white; transition: all 0.2s; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.5px;}
@@ -119,8 +129,11 @@
 
         <div class="metricas-container">
             <div class="metrica-card">
-                <span class="metrica-titulo">Total Arrecadado</span>
-                <span class="metrica-valor" id="metricaReceita">R$ 0,00</span>
+                <span class="metrica-titulo">
+                    Total Arrecadado
+                    <button id="btnOlho" class="btn-olho" title="Ocultar valores">👁️</button>
+                </span>
+                <span class="metrica-valor" id="metricaReceita" data-valor="0">R$ 0,00</span>
             </div>
             <div class="metrica-card sucesso">
                 <span class="metrica-titulo">Números Pagos</span>
@@ -133,7 +146,10 @@
         </div>
 
         <div class="controles-container">
-            <input type="text" id="pesquisaInput" class="barra-pesquisa" placeholder="🔍 Buscar cliente por nome ou telefone...">
+            <div class="grupo-pesquisa">
+                <input type="text" id="pesquisaInput" class="barra-pesquisa" placeholder="🔍 Buscar por nome, telefone, pedido ou número (ex: 042)...">
+                <input type="date" id="filtroData" class="filtro-data" title="Filtrar por Data de Compra">
+            </div>
             <div class="filtros-botoes" id="grupoFiltros">
                 <button class="btn-filtro ativo" data-filtro="todos">Todos</button>
                 <button class="btn-filtro" data-filtro="reservado">Aguardando Pagamento</button>
@@ -163,7 +179,12 @@
             const listaReservas = document.getElementById('listaReservas');
             const loader = document.getElementById('loader');
             const pesquisaInput = document.getElementById('pesquisaInput');
+            const filtroData = document.getElementById('filtroData');
             const botoesFiltro = document.querySelectorAll('.btn-filtro');
+            
+            const btnOlho = document.getElementById('btnOlho');
+            const metricaReceita = document.getElementById('metricaReceita');
+            let ocultarValores = false;
             
             let dadosAgrupados = [];
             let filtroAtual = 'todos';
@@ -177,31 +198,40 @@
             btnEntrar.addEventListener('click', async () => {
                 const email = emailAdmin.value.trim(); const senha = senhaAdmin.value.trim();
                 if (!email || !senha) { mostrarErro("Preencha e-mail e senha."); return; }
-
                 btnEntrar.innerText = "ENTRANDO..."; btnEntrar.disabled = true;
-
                 const { data, error } = await supabaseClient.auth.signInWithPassword({ email: email, password: senha });
-                if (error) {
-                    mostrarErro("E-mail ou senha incorretos.");
-                    btnEntrar.innerText = "ACESSAR PAINEL"; btnEntrar.disabled = false;
-                } else { mostrarDashboard(); }
+                if (error) { mostrarErro("E-mail ou senha incorretos."); btnEntrar.innerText = "ACESSAR PAINEL"; btnEntrar.disabled = false; } 
+                else { mostrarDashboard(); }
             });
 
-            btnSair.addEventListener('click', async () => {
-                await supabaseClient.auth.signOut(); window.location.reload(); 
-            });
+            btnSair.addEventListener('click', async () => { await supabaseClient.auth.signOut(); window.location.reload(); });
 
             function mostrarErro(mensagem) { msgErroLogin.innerText = mensagem; msgErroLogin.style.display = 'block'; }
-            function mostrarDashboard() {
-                telaLogin.style.display = 'none'; telaDashboard.style.display = 'block';
-                document.title = "Dashboard - Rifa PRO"; carregarDados(); 
+            function mostrarDashboard() { telaLogin.style.display = 'none'; telaDashboard.style.display = 'block'; document.title = "Dashboard - Rifa PRO"; carregarDados(); }
+
+            // ==========================================
+            // LÓGICA DO OLHINHO (ESCONDER SALDO)
+            // ==========================================
+            btnOlho.addEventListener('click', () => {
+                ocultarValores = !ocultarValores;
+                btnOlho.innerText = ocultarValores ? '🙈' : '👁️';
+                atualizarVisaoReceita();
+                renderizarCartoes(dadosAgrupados.filter(aplicarRegrasDeFiltro)); // Atualiza os cards também
+            });
+
+            function atualizarVisaoReceita() {
+                if (ocultarValores) {
+                    metricaReceita.innerText = 'R$ ****';
+                } else {
+                    metricaReceita.innerText = `R$ ${metricaReceita.getAttribute('data-valor')},00`;
+                }
             }
 
             async function carregarDados() {
                 loader.style.display = 'block'; listaReservas.innerHTML = '';
-                const { data, error } = await supabaseClient.from('numeros').select('*').neq('status', 'livre');
+                // Puxando também a coluna data_compra
+                const { data, error } = await supabaseClient.from('numeros').select('numero, status, nome_cliente, telefone_cliente, is_premiado, valor_premio, id_pedido, data_compra').neq('status', 'livre');
                 if (error) { console.error("Erro", error); loader.innerText = "Erro ao carregar."; return; }
-
                 calcularMetricas(data); agruparEProcessar(data); aplicarFiltrosEPesquisa();
                 loader.style.display = 'none';
             }
@@ -212,7 +242,8 @@
                     if (item.status === 'pago' || item.status === 'vendido') { pagos++; receita += VALOR_POR_PONTO; } 
                     else if (item.status === 'reservado') { pendentes++; }
                 });
-                document.getElementById('metricaReceita').innerText = `R$ ${receita},00`;
+                metricaReceita.setAttribute('data-valor', receita);
+                atualizarVisaoReceita();
                 document.getElementById('metricaPagos').innerText = pagos;
                 document.getElementById('metricaPendentes').innerText = pendentes;
             }
@@ -220,27 +251,59 @@
             function agruparEProcessar(dadosBrutos) {
                 const mapa = {};
                 dadosBrutos.forEach(item => {
-                    const chave = item.telefone_cliente;
+                    const chave = item.id_pedido || item.telefone_cliente;
                     if (!mapa[chave]) {
                         let statusCorrigido = (item.status === 'vendido') ? 'pago' : item.status;
-                        mapa[chave] = { nome: item.nome_cliente, telefone: item.telefone_cliente, status: statusCorrigido, numeros: [] };
+                        mapa[chave] = { 
+                            idPedido: chave,
+                            nome: item.nome_cliente || 'Sem Nome', 
+                            telefone: item.telefone_cliente || '', 
+                            dataCompra: item.data_compra || '', // Guardando a data
+                            status: statusCorrigido, 
+                            numeros: [], 
+                            temPremio: false, 
+                            detalhesPremio: [] 
+                        };
                     }
-                    mapa[chave].numeros.push(item.numero);
+                    mapa[chave].numeros.push({ num: item.numero, premiado: item.is_premiado });
+                    if (item.is_premiado) { mapa[chave].temPremio = true; mapa[chave].detalhesPremio.push(`Achou a Cota ${item.numero} (${item.valor_premio})`); }
                 });
                 dadosAgrupados = Object.values(mapa);
             }
 
-            function aplicarFiltrosEPesquisa() {
+            // ==========================================
+            // LÓGICA DOS FILTROS (MÚLTIPLA ESCOLHA)
+            // ==========================================
+            function aplicarRegrasDeFiltro(cliente) {
                 const termo = pesquisaInput.value.toLowerCase();
-                const filtrados = dadosAgrupados.filter(cliente => {
-                    const passaTexto = cliente.nome.toLowerCase().includes(termo) || cliente.telefone.includes(termo);
-                    const passaStatus = (filtroAtual === 'todos') || (cliente.status === filtroAtual);
-                    return passaTexto && passaStatus;
-                });
+                const dataSelecionada = filtroData.value;
+                
+                // 1. Pesquisa de Texto (Busca nome, telefone, pedido e também verifica se o NÚMERO exato está no carrinho)
+                const passaTexto = cliente.nome.toLowerCase().includes(termo) || 
+                                   cliente.telefone.includes(termo) || 
+                                   cliente.idPedido.toLowerCase().includes(termo) ||
+                                   cliente.numeros.some(n => String(n.num).padStart(3, '0').includes(termo) || String(n.num).includes(termo));
+                
+                // 2. Filtro de Status (Todos, Pagos, Pendentes)
+                const passaStatus = (filtroAtual === 'todos') || (cliente.status === filtroAtual);
+                
+                // 3. Filtro de Data do Calendário
+                let passaData = true;
+                if (dataSelecionada) {
+                    passaData = (cliente.dataCompra === dataSelecionada);
+                }
+                
+                return passaTexto && passaStatus && passaData;
+            }
+
+            function aplicarFiltrosEPesquisa() {
+                const filtrados = dadosAgrupados.filter(aplicarRegrasDeFiltro);
                 renderizarCartoes(filtrados);
             }
 
             pesquisaInput.addEventListener('input', aplicarFiltrosEPesquisa);
+            filtroData.addEventListener('change', aplicarFiltrosEPesquisa);
+            
             botoesFiltro.forEach(botao => {
                 botao.addEventListener('click', (e) => {
                     botoesFiltro.forEach(b => b.classList.remove('ativo'));
@@ -251,25 +314,44 @@
 
             function renderizarCartoes(dadosParaRenderizar) {
                 listaReservas.innerHTML = '';
-                if (dadosParaRenderizar.length === 0) {
-                    listaReservas.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color: var(--text-muted); padding: 40px; background: var(--bg-secondary); border-radius: 12px;">Nenhum cliente encontrado.</p>'; return;
-                }
+                if (dadosParaRenderizar.length === 0) { listaReservas.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color: var(--text-muted); padding: 40px; background: var(--bg-secondary); border-radius: 12px;">Nenhum cliente encontrado.</p>'; return; }
 
                 dadosParaRenderizar.forEach(cliente => {
-                    cliente.numeros.sort(); const isPago = cliente.status === 'pago'; const totalR$ = cliente.numeros.length * VALOR_POR_PONTO;
-                    const div = document.createElement('div'); div.className = `cartao-reserva ${isPago ? 'pago' : ''}`;
+                    cliente.numeros.sort((a, b) => a.num - b.num); 
+                    const isPago = cliente.status === 'pago'; 
+                    const totalR$ = cliente.numeros.length * VALOR_POR_PONTO;
+                    
+                    let dataFormatada = '';
+                    if (cliente.dataCompra) { const partes = cliente.dataCompra.split('-'); dataFormatada = `📅 ${partes[2]}/${partes[1]}/${partes[0]}`; }
+
+                    const classeVip = cliente.temPremio ? 'vip-premiado' : '';
+                    let htmlFaixaPremio = ''; if (cliente.temPremio) { htmlFaixaPremio = `<div class="faixa-premiada">🏆 ${cliente.detalhesPremio.join(' | ')}</div>`; }
+
+                    const div = document.createElement('div'); div.className = `cartao-reserva ${isPago ? 'pago' : ''} ${classeVip}`;
                     
                     div.innerHTML = `
+                        ${htmlFaixaPremio}
                         <div class="cartao-header">
-                            <div><h3 class="nome-cliente">${cliente.nome}</h3><p class="telefone-cliente">📱 ${cliente.telefone}</p></div>
-                            <span class="status-badge ${isPago ? 'pago' : ''}">${isPago ? '✓ PAGO' : '⏳ PENDENTE'}</span>
+                            <div>
+                                <h3 class="nome-cliente">${cliente.nome}</h3>
+                                <p class="telefone-cliente">📱 ${cliente.telefone}</p>
+                                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; font-family: monospace;">ID: ${cliente.idPedido}</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <span class="status-badge ${isPago ? 'pago' : ''}" style="display:block; margin-bottom: 5px;">${isPago ? '✓ PAGO' : '⏳ PENDENTE'}</span>
+                                <span style="font-size: 0.7rem; color: var(--text-muted);">${dataFormatada}</span>
+                            </div>
                         </div>
-                        <div class="info-valores"><p>Quantidade: <strong style="color: var(--text-light);">${cliente.numeros.length} números</strong></p><p>Total: <span class="valor-destaque">R$ ${totalR$},00</span></p></div>
-                        <div class="numeros-lista">${cliente.numeros.map(n => `<span class="numero-tag ${isPago ? 'pago' : ''}">${n}</span>`).join('')}</div>
+                        <div class="info-valores"><p>Quantidade: <strong style="color: var(--text-light);">${cliente.numeros.length} números</strong></p><p>Total: <span class="valor-destaque">${ocultarValores ? 'R$ ****' : `R$ ${totalR$},00`}</span></p></div>
+                        
+                        <div class="numeros-lista">
+                            ${cliente.numeros.map(obj => `<span class="numero-tag ${isPago ? 'pago' : ''} ${obj.premiado ? 'tag-premiada' : ''}">${obj.num}</span>`).join('')}
+                        </div>
+                        
                         <div class="botoes-acao">
-                            ${isPago ? `<button class="btn-acao btn-link" onclick="gerarLinkRecibo('${cliente.telefone}')">💬 Enviar VIP no Zap</button>` 
-                                     : `<button class="btn-acao btn-aprovar" onclick="aprovar('${cliente.telefone}', '${cliente.numeros.join(',')}')">✅ Aprovar PIX</button>`}
-                            <button class="btn-acao btn-cancelar" onclick="cancelar('${cliente.telefone}', '${cliente.numeros.join(',')}', ${isPago})">🗑️ Excluir</button>
+                            ${isPago ? `<button class="btn-acao btn-link" onclick="gerarLinkRecibo('${cliente.idPedido}', '${cliente.telefone}', ${cliente.temPremio})">💬 Enviar VIP no Zap</button>` 
+                                     : `<button class="btn-acao btn-aprovar" onclick="aprovar('${cliente.telefone}', '${cliente.numeros.map(n=>n.num).join(',')}')">✅ Aprovar PIX</button>`}
+                            <button class="btn-acao btn-cancelar" onclick="cancelar('${cliente.telefone}', '${cliente.numeros.map(n=>n.num).join(',')}', ${isPago})">🗑️ Excluir</button>
                         </div>
                     `;
                     listaReservas.appendChild(div);
@@ -277,42 +359,36 @@
             }
 
             window.aprovar = async function(telefone, numerosStr) {
-                if(!confirm('O dinheiro já caiu na conta? Confirmar o pagamento deste cliente?')) return;
+                if(!confirm('O dinheiro já caiu na conta? Confirmar o pagamento deste pedido?')) return;
                 const numeros = numerosStr.split(','); await supabaseClient.from('numeros').update({ status: 'pago' }).in('numero', numeros); carregarDados();
             };
 
             window.cancelar = async function(telefone, numerosStr, isPago) {
-                if (isPago) { if(!confirm('🚨 ALERTA: Este cliente já estava PAGO. Deseja cancelar a compra e liberar os números?')) return; } 
-                else { if(!confirm('Deseja excluir esta reserva e devolver os números para a tela inicial?')) return; }
-                const numeros = numerosStr.split(','); await supabaseClient.from('numeros').update({ status: 'livre', nome_cliente: null, telefone_cliente: null }).in('numero', numeros); carregarDados();
+                if (isPago) { if(!confirm('🚨 ALERTA: Este pedido já estava PAGO. Deseja cancelar a compra e liberar os números?')) return; } 
+                else { if(!confirm('Deseja excluir este pedido e devolver os números para a tela inicial?')) return; }
+                const numeros = numerosStr.split(','); await supabaseClient.from('numeros').update({ status: 'livre', nome_cliente: null, telefone_cliente: null, id_pedido: null, data_compra: null }).in('numero', numeros); carregarDados();
             };
 
-            // =========================================
-            // MÁGICA DO WHATSAPP + LINK CAMUFLADO
-            // =========================================
-            window.gerarLinkRecibo = function(telefone) {
-                // 1. Gera URL Base
+            window.gerarLinkRecibo = function(idPedido, telefone, temPremio) {
                 const urlBase = window.location.href.substring(0, window.location.href.lastIndexOf('/')) + '/';
-                
-                // 2. Camufla o telefone
-                const idCamuflado = btoa(telefone); 
-                const linkRecibo = `${urlBase}recibo.html?id=${idCamuflado}`;
-                
-                // 3. Monta a Mensagem Persuasiva
-                const mensagem = `🎉 *PAGAMENTO APROVADO!*\n\n` +
-                                 `Sua participação na Rifa Imperdível está 100% confirmada.\n\n` +
-                                 `Acesse o seu *Recibo VIP* para conferir seus números da sorte:\n` +
-                                 `🔗 ${linkRecibo}\n\n` +
-                                 `Boa sorte! 🍀`;
-                
-                // 4. Limpa o telefone para o padrão do WhatsApp (Adicionando 55)
-                const telefoneLimpo = "55" + telefone.replace(/\D/g, '');
-                const linkWhatsapp = `https://wa.me/${telefoneLimpo}?text=${encodeURIComponent(mensagem)}`;
-                
-                // 5. Copia pro teclado (backup) e abre o WhatsApp
-                navigator.clipboard.writeText(mensagem).then(() => {
-                    window.open(linkWhatsapp, '_blank');
-                });
+                const idCamuflado = btoa(idPedido); const linkRecibo = `${urlBase}recibo.html?id=${idCamuflado}`;
+                let mensagem = '';
+                if(temPremio) {
+                    mensagem = `🏆 *SURPRESA! VOCÊ ACHOU A COTA PREMIADA!*\n\n` +
+                               `O seu PIX foi aprovado e o sistema identificou um bilhete dourado no seu pedido (${idPedido})!\n\n` +
+                               `Abra o seu recibo para ver a festa e resgatar seu prêmio na hora:\n` +
+                               `🔗 ${linkRecibo}\n\n` +
+                               `Parabéns!!! 🎉🎉🎉`;
+                } else {
+                    mensagem = `🎉 *PAGAMENTO APROVADO!*\n\n` +
+                               `Sua participação na Rifa Imperdível está confirmada.\n` +
+                               `Pedido: ${idPedido}\n\n` +
+                               `Acesse o seu Recibo VIP para conferir seus números:\n` +
+                               `🔗 ${linkRecibo}\n\n` +
+                               `Boa sorte! 🍀`;
+                }
+                const telefoneLimpo = "55" + telefone.replace(/\D/g, ''); const linkWhatsapp = `https://wa.me/${telefoneLimpo}?text=${encodeURIComponent(mensagem)}`;
+                navigator.clipboard.writeText(mensagem).then(() => { window.open(linkWhatsapp, '_blank'); });
             };
 
             checarSessao();
