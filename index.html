@@ -65,7 +65,7 @@
         .bolinha.pago { background-color: rgba(255, 255, 255, 0.1); border: 1px solid transparent; }
 
         .grid-numeros { display: grid; grid-template-columns: repeat(auto-fill, minmax(62px, 1fr)); gap: 10px; justify-content: center; }
-        .numero { background-color: var(--bg-secondary); border: var(--border-gold-thin); color: var(--text-light); font-size: 1.1rem; font-weight: 700; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+        .numero { background-color: var(--bg-secondary); border: var(--border-gold-thin); color: var(--green); font-size: 1.1rem; font-weight: 800; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
         .numero.livre:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-3px); box-shadow: 0 10px 20px -10px rgba(251, 191, 36, 0.3); }
         .numero.selecionado { background-color: var(--green); border-color: var(--green); color: #fff; transform: translateY(-3px); box-shadow: 0 0 15px var(--green-glow); }
         .numero.reservado { background-color: rgba(251, 191, 36, 0.15); border-color: transparent; color: var(--gold); cursor: not-allowed; }
@@ -425,4 +425,5 @@
         });
     </script>
 </body>
+
 </html>
