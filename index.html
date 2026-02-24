@@ -300,7 +300,10 @@
                         if (porcentagemVendida >= 50) {
                             document.getElementById('boxProgresso').style.display = 'block';
                             document.getElementById('porcentagemTexto').innerText = Math.floor(porcentagemVendida);
-                            setTimeout(() => { document.getElementById('barraPreenchimento').style.width = `${porcentagemVendida}%`; }, 500);
+                            
+                            setTimeout(() => {
+                                document.getElementById('barraPreenchimento').style.width = `${porcentagemVendida}%`;
+                            }, 500);
                         }
                     }
                 } catch (err) {
@@ -343,11 +346,35 @@
 
             fecharModalBtn.addEventListener('click', () => modalOverlay.classList.remove('ativo'));
 
+            // ========================================================
+            // A MÁGICA ACONTECE AQUI: BOTÃO "IR PARA PAGAMENTO"
+            // ========================================================
             btnAvancarPagamento.addEventListener('click', () => {
                 if (!nomeClienteInput.value.trim() || telefoneClienteInput.value.replace(/\D/g, '').length < 10) {
                     alert('Preencha seu nome e um WhatsApp válido com DDD!');
                     return;
                 }
+
+                // --- INÍCIO DO CÓDIGO DO DISCORD WEBHOOK ---
+                const nome = nomeClienteInput.value.trim();
+                const telefone = telefoneClienteInput.value.trim();
+                const selecionados = document.querySelectorAll('.numero.selecionado');
+                const numerosEscolhidos = Array.from(selecionados).map(botao => botao.innerText);
+                const total = selecionados.length * VALOR_POR_PONTO;
+
+                const DISCORD_WEBHOOK_URL = "https://discordapp.com/api/webhooks/1475820091810648156/eYImQUuUOtJ57MLVgOjhnEKBmaOShh06k0hJS4-zh8IznULXFbh51_4ETxQKSW0NQoqa"; 
+                
+                const msgDiscord = {
+                    content: `🚨 **CLIENTE NO CHECKOUT! (Aguardando PIX)**\n\n👤 **Cliente:** ${nome}\n📱 **WhatsApp:** ${telefone}\n🎟️ **Números:** ${numerosEscolhidos.join(', ')}\n💰 **Total:** R$ ${total},00\n\n👀 *O cliente acabou de ver a chave PIX. Se não enviar o comprovante logo, chame-o no WhatsApp para recuperar a venda!*`
+                };
+                
+                fetch(DISCORD_WEBHOOK_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(msgDiscord)
+                }).catch(err => console.error("Erro no Discord", err));
+                // --- FIM DO CÓDIGO DO DISCORD WEBHOOK ---
+
                 passo1.classList.remove('ativo');
                 passo2.classList.add('ativo');
                 modalTitulo.innerText = "Pagamento via PIX";
@@ -389,22 +416,6 @@
                         .in('numero', numerosEscolhidos);
 
                     if (error) throw error;
-
-                    // ==========================================
-                    // NOTIFICAÇÃO SILENCIOSA NO DISCORD
-                    // ==========================================
-                    const DISCORD_WEBHOOK_URL = "https://discordapp.com/api/webhooks/1475820091810648156/eYImQUuUOtJ57MLVgOjhnEKBmaOShh06k0hJS4-zh8IznULXFbh51_4ETxQKSW0NQoqa"; 
-                    
-                    const msgDiscord = {
-                        content: `🚨 **NOVA RESERVA!**\n\n👤 **Cliente:** ${nome}\n📱 **WhatsApp:** ${telefone}\n🎟️ **Números:** ${numerosEscolhidos.join(', ')}\n💰 **Total:** R$ ${total},00\n\n👀 *Atenção: Se o comprovante não chegar, chame o cliente no WhatsApp!*`
-                    };
-                    
-                    fetch(DISCORD_WEBHOOK_URL, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(msgDiscord)
-                    }).catch(err => console.error("Erro no Discord", err));
-                    // ==========================================
 
                     const mensagem = `✅ *RESERVA REALIZADA*\n\n` +
                                      `Olá! Fiz a reserva na Rifa Imperdível.\n` +
