@@ -70,12 +70,7 @@
             background: linear-gradient(145deg, var(--bg-secondary), rgba(251, 191, 36, 0.05));
             box-shadow: 0 0 20px rgba(251, 191, 36, 0.2);
         }
-        .faixa-premiada {
-            background-color: var(--gold); color: #000; font-size: 0.8rem; font-weight: 900;
-            text-transform: uppercase; letter-spacing: 1px; padding: 5px 10px;
-            display: inline-block; border-radius: 5px; margin-bottom: 10px;
-            animation: piscar 2s infinite;
-        }
+        .faixa-premiada { background-color: var(--gold); color: #000; font-size: 0.8rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; padding: 5px 10px; display: inline-block; border-radius: 5px; margin-bottom: 10px; animation: piscar 2s infinite; }
         @keyframes piscar { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
 
         .cartao-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
@@ -218,8 +213,13 @@
 
             async function carregarDados() {
                 loader.style.display = 'block'; listaReservas.innerHTML = '';
-                // Busca os dados incluindo as colunas de premiação novas
-                const { data, error } = await supabaseClient.from('numeros').select('numero, status, nome_cliente, telefone_cliente, is_premiado, valor_premio').neq('status', 'livre');
+                
+                // NOVIDADE: Agora o banco puxa a coluna 'id_pedido'
+                const { data, error } = await supabaseClient
+                    .from('numeros')
+                    .select('numero, status, nome_cliente, telefone_cliente, is_premiado, valor_premio, id_pedido')
+                    .neq('status', 'livre');
+                    
                 if (error) { console.error("Erro", error); loader.innerText = "Erro ao carregar."; return; }
 
                 calcularMetricas(data); agruparEProcessar(data); aplicarFiltrosEPesquisa();
@@ -237,14 +237,27 @@
                 document.getElementById('metricaPendentes').innerText = pendentes;
             }
 
+            // ==========================================
+            // NOVA LÓGICA DE AGRUPAMENTO: POR ID_PEDIDO
+            // ==========================================
             function agruparEProcessar(dadosBrutos) {
                 const mapa = {};
                 dadosBrutos.forEach(item => {
-                    const chave = item.telefone_cliente;
+                    // Chave Mágica: É o ID do pedido. 
+                    // Se for cliente bem antigo que ainda não tem ID gerado, ele usa o telefone para não quebrar.
+                    const chave = item.id_pedido || item.telefone_cliente;
+                    
                     if (!mapa[chave]) {
                         let statusCorrigido = (item.status === 'vendido') ? 'pago' : item.status;
-                        // Adicionamos flags para saber se esse cliente tem premio
-                        mapa[chave] = { nome: item.nome_cliente, telefone: item.telefone_cliente, status: statusCorrigido, numeros: [], temPremio: false, detalhesPremio: [] };
+                        mapa[chave] = { 
+                            idPedido: chave,
+                            nome: item.nome_cliente || 'Sem Nome', 
+                            telefone: item.telefone_cliente || '', 
+                            status: statusCorrigido, 
+                            numeros: [], 
+                            temPremio: false, 
+                            detalhesPremio: [] 
+                        };
                     }
                     mapa[chave].numeros.push({ num: item.numero, premiado: item.is_premiado });
                     
@@ -259,7 +272,7 @@
             function aplicarFiltrosEPesquisa() {
                 const termo = pesquisaInput.value.toLowerCase();
                 const filtrados = dadosAgrupados.filter(cliente => {
-                    const passaTexto = cliente.nome.toLowerCase().includes(termo) || cliente.telefone.includes(termo);
+                    const passaTexto = cliente.nome.toLowerCase().includes(termo) || cliente.telefone.includes(termo) || cliente.idPedido.toLowerCase().includes(termo);
                     const passaStatus = (filtroAtual === 'todos') || (cliente.status === filtroAtual);
                     return passaTexto && passaStatus;
                 });
@@ -282,12 +295,10 @@
                 }
 
                 dadosParaRenderizar.forEach(cliente => {
-                    // Ordena os números
                     cliente.numeros.sort((a, b) => a.num - b.num); 
                     const isPago = cliente.status === 'pago'; 
                     const totalR$ = cliente.numeros.length * VALOR_POR_PONTO;
                     
-                    // Se tiver prêmio, aplica a classe vip e monta a faixa
                     const classeVip = cliente.temPremio ? 'vip-premiado' : '';
                     let htmlFaixaPremio = '';
                     if (cliente.temPremio) {
@@ -297,10 +308,15 @@
                     const div = document.createElement('div'); 
                     div.className = `cartao-reserva ${isPago ? 'pago' : ''} ${classeVip}`;
                     
+                    // EXIBINDO O ID DO PEDIDO NO CARTÃO
                     div.innerHTML = `
                         ${htmlFaixaPremio}
                         <div class="cartao-header">
-                            <div><h3 class="nome-cliente">${cliente.nome}</h3><p class="telefone-cliente">📱 ${cliente.telefone}</p></div>
+                            <div>
+                                <h3 class="nome-cliente">${cliente.nome}</h3>
+                                <p class="telefone-cliente">📱 ${cliente.telefone}</p>
+                                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; font-family: monospace;">ID: ${cliente.idPedido}</p>
+                            </div>
                             <span class="status-badge ${isPago ? 'pago' : ''}">${isPago ? '✓ PAGO' : '⏳ PENDENTE'}</span>
                         </div>
                         <div class="info-valores"><p>Quantidade: <strong style="color: var(--text-light);">${cliente.numeros.length} números</strong></p><p>Total: <span class="valor-destaque">R$ ${totalR$},00</span></p></div>
@@ -310,7 +326,7 @@
                         </div>
                         
                         <div class="botoes-acao">
-                            ${isPago ? `<button class="btn-acao btn-link" onclick="gerarLinkRecibo('${cliente.telefone}', ${cliente.temPremio})">💬 Enviar VIP no Zap</button>` 
+                            ${isPago ? `<button class="btn-acao btn-link" onclick="gerarLinkRecibo('${cliente.idPedido}', '${cliente.telefone}', ${cliente.temPremio})">💬 Enviar VIP no Zap</button>` 
                                      : `<button class="btn-acao btn-aprovar" onclick="aprovar('${cliente.telefone}', '${cliente.numeros.map(n=>n.num).join(',')}')">✅ Aprovar PIX</button>`}
                             <button class="btn-acao btn-cancelar" onclick="cancelar('${cliente.telefone}', '${cliente.numeros.map(n=>n.num).join(',')}', ${isPago})">🗑️ Excluir</button>
                         </div>
@@ -320,32 +336,41 @@
             }
 
             window.aprovar = async function(telefone, numerosStr) {
-                if(!confirm('O dinheiro já caiu na conta? Confirmar o pagamento deste cliente?')) return;
+                if(!confirm('O dinheiro já caiu na conta? Confirmar o pagamento deste pedido?')) return;
                 const numeros = numerosStr.split(','); await supabaseClient.from('numeros').update({ status: 'pago' }).in('numero', numeros); carregarDados();
             };
 
             window.cancelar = async function(telefone, numerosStr, isPago) {
-                if (isPago) { if(!confirm('🚨 ALERTA: Este cliente já estava PAGO. Deseja cancelar a compra e liberar os números?')) return; } 
-                else { if(!confirm('Deseja excluir esta reserva e devolver os números para a tela inicial?')) return; }
-                const numeros = numerosStr.split(','); await supabaseClient.from('numeros').update({ status: 'livre', nome_cliente: null, telefone_cliente: null }).in('numero', numeros); carregarDados();
+                if (isPago) { if(!confirm('🚨 ALERTA: Este pedido já estava PAGO. Deseja cancelar a compra e liberar os números?')) return; } 
+                else { if(!confirm('Deseja excluir este pedido e devolver os números para a tela inicial?')) return; }
+                
+                // NOVIDADE: Ao cancelar, limpamos o ID do pedido também, além de telefone e nome
+                const numeros = numerosStr.split(','); 
+                await supabaseClient.from('numeros').update({ status: 'livre', nome_cliente: null, telefone_cliente: null, id_pedido: null }).in('numero', numeros); 
+                carregarDados();
             };
 
-            // Link do Whatsapp muda se o cara for premiado
-            window.gerarLinkRecibo = function(telefone, temPremio) {
+            // ==========================================
+            // LINK CAMUFLADO USANDO O ID DO PEDIDO!
+            // ==========================================
+            window.gerarLinkRecibo = function(idPedido, telefone, temPremio) {
                 const urlBase = window.location.href.substring(0, window.location.href.lastIndexOf('/')) + '/';
-                const idCamuflado = btoa(telefone); 
+                
+                // Transforma o ID do Pedido em código secreto para o link
+                const idCamuflado = btoa(idPedido); 
                 const linkRecibo = `${urlBase}recibo.html?id=${idCamuflado}`;
                 
                 let mensagem = '';
                 if(temPremio) {
                     mensagem = `🏆 *SURPRESA! VOCÊ ACHOU A COTA PREMIADA!*\n\n` +
-                               `O seu PIX foi aprovado e o sistema identificou um bilhete dourado nas suas escolhas!\n\n` +
+                               `O seu PIX foi aprovado e o sistema identificou um bilhete dourado no seu pedido (${idPedido})!\n\n` +
                                `Abra o seu recibo para ver a festa e resgatar seu prêmio na hora:\n` +
                                `🔗 ${linkRecibo}\n\n` +
                                `Parabéns!!! 🎉🎉🎉`;
                 } else {
                     mensagem = `🎉 *PAGAMENTO APROVADO!*\n\n` +
-                               `Sua participação na Rifa Imperdível está confirmada.\n\n` +
+                               `Sua participação na Rifa Imperdível está confirmada.\n` +
+                               `Pedido: ${idPedido}\n\n` +
                                `Acesse o seu Recibo VIP para conferir seus números:\n` +
                                `🔗 ${linkRecibo}\n\n` +
                                `Boa sorte! 🍀`;
