@@ -219,7 +219,6 @@
             const btnFinalizarReserva = document.getElementById('btnFinalizarReserva');
             const telaCarregamento = document.getElementById('telaCarregamento');
 
-            // VARIÁVEL NOVA: Guarda o ID do pedido que está sendo feito agora
             let idPedidoAtual = '';
 
             textoChavePix.innerText = CHAVE_PIX;
@@ -336,16 +335,12 @@
 
             fecharModalBtn.addEventListener('click', () => modalOverlay.classList.remove('ativo'));
 
-            // ========================================================
-            // BOTÃO "IR PARA PAGAMENTO" (Gera o ID e avisa no Discord)
-            // ========================================================
             btnAvancarPagamento.addEventListener('click', () => {
                 if (!nomeClienteInput.value.trim() || telefoneClienteInput.value.replace(/\D/g, '').length < 10) {
                     alert('Preencha seu nome e um WhatsApp válido com DDD!');
                     return;
                 }
 
-                // GERA O ID ÚNICO DESTA COMPRA (Ex: PED-5X9A2B1C)
                 idPedidoAtual = 'PED-' + Math.random().toString(36).substring(2, 10).toUpperCase();
 
                 const nome = nomeClienteInput.value.trim();
@@ -390,9 +385,6 @@
                 });
             });
 
-            // ========================================================
-            // BOTÃO "ENVIAR COMPROVANTE" (Salva no banco com o ID novo)
-            // ========================================================
             btnFinalizarReserva.addEventListener('click', async () => {
                 const nome = nomeClienteInput.value.trim();
                 const telefone = telefoneClienteInput.value.trim();
@@ -404,14 +396,16 @@
                 btnFinalizarReserva.disabled = true;
 
                 try {
-                    // ATUALIZADO: Agora salva a coluna id_pedido junto com o resto!
+                    // ATUALIZADO: Agora salva a Data e a Hora!
                     const { error } = await supabaseClient
                         .from('numeros')
                         .update({ 
                             status: 'reservado', 
                             nome_cliente: nome, 
                             telefone_cliente: telefone,
-                            id_pedido: idPedidoAtual 
+                            id_pedido: idPedidoAtual,
+                            data_compra: new Date().toISOString().split('T')[0],
+                            hora_compra: new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})
                         })
                         .in('numero', numerosEscolhidos);
 
