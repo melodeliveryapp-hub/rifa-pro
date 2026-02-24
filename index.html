@@ -401,6 +401,22 @@
 
                     if (error) throw error;
 
+                    // ==========================================
+                    // NOTIFICAÇÃO SILENCIOSA NO DISCORD
+                    // ==========================================
+                    const DISCORD_WEBHOOK_URL = "https://discordapp.com/api/webhooks/1475820091810648156/eYImQUuUOtJ57MLVgOjhnEKBmaOShh06k0hJS4-zh8IznULXFbh51_4ETxQKSW0NQoqa"; 
+                    
+                    const msgDiscord = {
+                        content: `🚨 **NOVA RESERVA INICIADA**\n\n👤 **Cliente:** ${nome}\n📱 **WhatsApp:** ${telefone}\n🎟️ **Números:** ${numerosEscolhidos.join(', ')}\n💰 **Total:** R$ ${total},00\n\n👀 *Fique atento! Se o PIX não chegar, chame o cliente no Zap!*`
+                    };
+                    
+                    fetch(DISCORD_WEBHOOK_URL, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(msgDiscord)
+                    }).catch(err => console.error("Erro no Discord", err));
+                    // ==========================================
+
                     const mensagem = `✅ *RESERVA REALIZADA*\n\n` +
                                      `Olá! Fiz a reserva na Rifa Imperdível.\n` +
                                      `*Nome:* ${nome}\n` +
