@@ -69,8 +69,8 @@
 
     <div class="recibo-cartao">
         <div id="estadoCarregando">
-            <h2 style="color: var(--gold); margin-bottom: 15px; font-size: 1.2rem;">A Validar Recibo...</h2>
-            <p class="mensagem">A verificar autenticidade no sistema.</p>
+            <h2 style="color: var(--gold); margin-bottom: 15px; font-size: 1.2rem;">Validando Recibo...</h2>
+            <p class="mensagem">Verificando autenticidade no sistema.</p>
         </div>
 
         <div id="estadoSucesso" class="escondido">
@@ -78,16 +78,16 @@
             
             <div class="icone-sucesso" id="iconeTopo">✓</div>
             <h1 id="tituloRecibo">Pagamento Aprovado</h1>
-            <p class="mensagem" id="textoBoasVindas">Boa sorte, <strong>Cliente</strong>! A sua participação está confirmada e registada.</p>
+            <p class="mensagem" id="textoBoasVindas">Boa sorte, <strong>Cliente</strong>! Sua participação está confirmada e registrada.</p>
             
             <div class="box-premio" id="boxPremio">
                 <h4>🎉 COTA ENCONTRADA 🎉</h4>
-                <p id="textoPremioEncontrado">Ganhou R$ 0,00</p>
+                <p id="textoPremioEncontrado">Você ganhou R$ 0,00</p>
                 <span style="font-size: 0.8rem; color: rgba(255,255,255,0.7); display:block; margin-top:5px;">Chame o admin no WhatsApp para receber o PIX na hora!</span>
             </div>
 
             <div class="box-numeros">
-                <h3>Os Seus Números</h3>
+                <h3>Seus Números</h3>
                 <div class="grid-numeros-cliente" id="containerNumeros"></div>
             </div>
             
@@ -96,13 +96,13 @@
                 <div id="dataTransacao"></div>
             </div>
             
-            <a href="index.html" class="btn-voltar">Aceder à Rifa</a>
+            <a href="index.html" class="btn-voltar">Acessar a Rifa</a>
         </div>
 
         <div id="estadoErro" class="escondido">
             <div class="icone-sucesso" style="background-color: rgba(239, 68, 68, 0.1); color: var(--red); border-color: rgba(239, 68, 68, 0.3); box-shadow: none;">!</div>
             <h1 class="erro">Recibo não encontrado</h1>
-            <p class="mensagem">O link acedido é inválido ou o pagamento ainda não foi processado pelo administrador.</p>
+            <p class="mensagem">O link acessado é inválido ou o pagamento ainda não foi processado pelo administrador.</p>
             <a href="index.html" class="btn-voltar" style="background: transparent; border: 1px solid var(--text-muted); color: var(--text-light); box-shadow: none;">Voltar para a Rifa</a>
         </div>
     </div>
@@ -133,13 +133,11 @@
 
             let idPedido;
             try { 
-                // Agora o recibo descodifica o ID do Pedido
                 idPedido = atob(idCamuflado); 
             } 
             catch (e) { mostrarErro(); return; }
 
             try {
-                // O recibo procura exclusivamente pelos números atrelados a este Pedido
                 const { data, error } = await supabaseClient
                     .from('numeros')
                     .select('numero, status, nome_cliente, is_premiado, valor_premio, data_compra, hora_compra')
@@ -169,7 +167,7 @@
                         iconeTopo.classList.add('icone-premiado');
                         tituloRecibo.innerHTML = 'COTA PREMIADA!';
                         tituloRecibo.style.color = 'var(--gold)';
-                        textoBoasVindas.innerHTML = `Parabéns, <strong style="font-size: 1.2rem;">${nome}</strong>! Tirou a sorte grande hoje.`;
+                        textoBoasVindas.innerHTML = `Parabéns, <strong style="font-size: 1.2rem;">${nome}</strong>! Você tirou a sorte grande hoje.`;
                         
                         boxPremio.style.display = 'block';
                         textoPremioEncontrado.innerText = `Cotas: ${premioDescricao.join(' e ')}`;
@@ -184,10 +182,8 @@
                         textoBoasVindas.innerHTML = `Sorteio autorizado para<br><strong style="font-size: 1.2rem;">${nome}</strong>`;
                     }
                     
-                    // Mostra o código do Pedido na parte inferior
                     codigoTransacao.innerHTML = `PEDIDO: <span>${idPedido}</span>`;
                     
-                    // Se tiver data e hora no banco, mostra no recibo
                     if (dataDaCompra) {
                         const partes = dataDaCompra.split('-');
                         const formatada = `${partes[2]}/${partes[1]}/${partes[0]}`;
